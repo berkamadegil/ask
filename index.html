@@ -101,16 +101,16 @@
       gap: 0;
     }
     .right-gap-grid > div:nth-child(odd) {
-      margin-right: 1rem;
+      margin-right: 1.5rem;
     }
     @media (min-width: 640px) {
       .right-gap-grid > div:nth-child(odd) {
-        margin-right: 1.5rem;
+        margin-right: 2rem;
       }
     }
     @media (min-width: 768px) {
       .right-gap-grid > div:nth-child(odd) {
-        margin-right: 2rem;
+        margin-right: 2.5rem;
       }
     }
   </style>
@@ -259,20 +259,20 @@
           )}
           {selectedPhoto && (
             <div className={`modal ${modalVisible ? 'visible' : 'hidden'}`}>
-              <div className="relative">
+              <div className="relative w-full max-w-[90%] sm:max-w-[80%] md:max-w-[70%]">
                 <button
-                  className="absolute top-4 left-4 text-white text-2xl"
+                  className="absolute top-4 left-4 text-white text-2xl bg-violet-600 rounded-lg px-4 py-2 hover:bg-violet-700 transition"
                   onClick={closeModal}
                 >
                   Geri
                 </button>
-                <div className="bg-black h-96 w-96 rounded-lg mx-auto"></div>
+                <div className="bg-black h-[80vh] w-full rounded-lg mx-auto"></div>
               </div>
             </div>
           )}
           {previewPhoto && (
             <div className={`modal ${previewVisible ? 'visible' : 'hidden'}`} onMouseUp={endPreview} onTouchEnd={endPreview}>
-              <div className="bg-black h-96 w-96 rounded-lg mx-auto"></div>
+              <div className="bg-black h-[80vh] w-full max-w-[90%] sm:max-w-[80%] md:max-w-[70%] rounded-lg mx-auto"></div>
             </div>
           )}
           {(activeTab === 'İlklerimiz' || activeTab === 'Galerimiz') && (
@@ -415,7 +415,7 @@
           <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border">
             <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
               {filteredPhotos.length === 0 ? (
-                <p className="text-center text-gray-700 text-xl sm:text-2xl">Arama sonucu bulunamadı</p>
+                <p className="text-center text-gray-700 text Caring for Your Pet in Winter-xl sm:text-2xl">Arama sonucu bulunamadı</p>
               ) : (
                 filteredPhotos.map((photo, index) => (
                   <div
