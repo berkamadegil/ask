@@ -1,66 +1,599 @@
-function Gallery({ photos }) {
-  const [selected, setSelected] = useState(null);
-  const [isPreview, setIsPreview] = useState(false);
-  const [pressTimer, setPressTimer] = useState(null);
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aşk Sitemiz</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.24.7/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Raleway:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .animated-border {
+      position: relative;
+      z-index: 0;
+    }
+    .animated-border::before {
+      content: '';
+      position: absolute;
+      top: -12px;
+      left: -12px;
+      right: -12px;
+      bottom: -12px;
+      background: linear-gradient(270deg, #f472b6, #ffffff, #f472b6);
+      background-size: 400% 400%;
+      animation: gradientAnimation 10s ease infinite;
+      z-index: -1;
+      border-radius: 12px;
+    }
+    .menu-button {
+      position: relative;
+      z-index: 0;
+      transition: background-color 0.3s ease;
+    }
+    .menu-button::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
+      background: linear-gradient(270deg, #f472b6, #ffffff, #f472b6);
+      background-size: 400% 400%;
+      animation: gradientAnimation 8s ease infinite;
+      z-index: -1;
+      border-radius: 8px;
+    }
+    .menu-button:hover, .menu-button.active {
+      background-color: white;
+    }
+    .menu-button:hover::before, .menu-button.active::before {
+      background: none;
+    }
+    .fade-up {
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-in-out;
+    }
+    .sidebar.open {
+      transform: translateX(0);
+    }
+    body {
+      font-family: 'Raleway', sans-serif;
+    }
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+    .modal.visible {
+      opacity: 1;
+    }
+    .modal.hidden {
+      opacity: 0;
+    }
+    .right-gap-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0;
+    }
+    .right-gap-grid > div:nth-child(odd) {
+      margin-right: 1.5rem;
+    }
+    @media (min-width: 640px) {
+      .right-gap-grid > div:nth-child(odd) {
+        margin-right: 2rem;
+      }
+    }
+    @media (min-width: 768px) {
+      .right-gap-grid > div:nth-child(odd) {
+        margin-right: 2.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
 
-  const handlePressStart = (photo) => {
-    const timer = setTimeout(() => {
-      setSelected(photo);
-      setIsPreview(true);
-    }, 1500); // 1.5 saniye basılı tutma
-    setPressTimer(timer);
+    function App() {
+      const [username, setUsername] = useState('');
+      const [password, setPassword] = useState('');
+      const [isLoggedIn, setIsLoggedIn] = useState(false);
+      const [error, setError] = useState('');
+
+      const handleLogin = (e) => {
+        e.preventDefault();
+        if (username === 'admin' && password === 'admin') {
+          setIsLoggedIn(true);
+          setError('');
+        } else {
+          setError('Kullanıcı adı veya şifre yanlış!');
+        }
+      };
+
+      if (isLoggedIn) {
+        return <MainLayout />;
+      }
+
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-rose-100 to-violet-200 flex items-center justify-center p-4">
+          <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-xs sm:max-w-sm">
+            <h2 className="text-3xl sm:text-4xl font-bold text-center text-violet-700 mb-6 sm:mb-8">Giriş Yap</h2>
+            {error && <p className="text-red-500 text-center mb-4 sm:mb-6 font-medium text-xl sm:text-2xl">{error}</p>}
+            <form onSubmit={handleLogin} className="space-y-4 sm:space-y-6">
+              <div>
+                <label className="block text-lg sm:text-xl font-semibold text-gray-700 mb-2">Kullanıcı Adı</label>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 transition text-lg sm:text-xl"
+                  placeholder="Kullanıcı adı girin"
+                />
+              </div>
+              <div>
+                <label className="block text-lg sm:text-xl font-semibold text-gray-700 mb-2">Şifre</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 transition text-lg sm:text-xl"
+                  placeholder="Şifre girin"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-violet-600 text-white py-2 sm:py-3 rounded-lg hover:bg-violet-700 transition duration-300 font-semibold text-xl sm:text-2xl"
+              >
+                Giriş Yap
+              </button>
+            </form>
+          </div>
+        </div>
+      );
+    }
+
+    function MainLayout() {
+      const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+      const [activeTab, setActiveTab] = useState('İlklerimiz');
+      const [selectedPhoto, setSelectedPhoto] = useState(null);
+      const [previewPhoto, setPreviewPhoto] = useState(null);
+      const [modalVisible, setModalVisible] = useState(false);
+      const [previewVisible, setPreviewVisible] = useState(false);
+
+      const toggleSidebar = () => {
+        setIsSidebarOpen(!isSidebarOpen);
+      };
+
+      const openModal = (photoId) => {
+        setSelectedPhoto(photoId);
+        setModalVisible(true);
+      };
+
+      const closeModal = () => {
+        setModalVisible(false);
+        setTimeout(() => setSelectedPhoto(null), 500); // Wait for fade out
+      };
+
+      const startPreview = (photoId) => {
+        setPreviewPhoto(photoId);
+        setPreviewVisible(true);
+      };
+
+      const endPreview = () => {
+        setPreviewVisible(false);
+        setTimeout(() => setPreviewPhoto(null), 500); // Wait for fade out
+      };
+
+      const scrollDown = () => {
+        window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+      };
+
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-rose-100 to-violet-200 flex flex-col">
+          <button
+            className="fixed top-4 left-4 z-50 p-2 bg-violet-600 text-white rounded-lg md:hidden"
+            onClick={toggleSidebar}
+          >
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+          <Sidebar
+            isOpen={isSidebarOpen}
+            toggleSidebar={toggleSidebar}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+          />
+          {activeTab === 'İlklerimiz' && <FirstsPage />}
+          {activeTab === 'Galerimiz' && <GalleryPage openModal={openModal} startPreview={startPreview} endPreview={endPreview} />}
+          {activeTab === 'Oyunlar' && (
+              <div className="flex-1 flex justify-center py-8 px-4 sm:px-6 md:ml-48">
+              <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border p-4 sm:p-6 md:p-8">
+              <MemoryGame />
+              </div>
+              </div>
+                )}
+          {activeTab === 'Sana Olan Mesajım' && (
+            <div className="flex-1 flex justify-center py-8 px-4 sm:px-6 md:ml-48">
+              <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border p-4 sm:p-6 md:p-8">
+                <h2 className="text-2xl sm:text-3xl text-violet-700 text-center">Sana Olan Mesajım (Yakında!)</h2>
+              </div>
+            </div>
+          )}
+          {selectedPhoto && (
+            <div className={`modal ${modalVisible ? 'visible' : 'hidden'}`}>
+              <div className="relative w-full max-w-[90%] sm:max-w-[80%] md:max-w-[70%]">
+                <button
+                  className="absolute top-4 left-4 text-white text-2xl bg-violet-600 rounded-lg px-4 py-2 hover:bg-violet-700 transition"
+                  onClick={closeModal}
+                >
+                  Geri
+                </button>
+                <div className="bg-black h-[80vh] w-full rounded-lg mx-auto"></div>
+              </div>
+            </div>
+          )}
+          {previewPhoto && (
+            <div className={`modal ${previewVisible ? 'visible' : 'hidden'}`} onMouseUp={endPreview} onTouchEnd={endPreview}>
+              <div className="bg-black h-[80vh] w-full max-w-[90%] sm:max-w-[80%] md:max-w-[70%] rounded-lg mx-auto"></div>
+            </div>
+          )}
+          {(activeTab === 'İlklerimiz' || activeTab === 'Galerimiz') && (
+            <div className="fixed right-4 top-1/2 transform -translate-y-1/2 z-50 flex flex-col items-center">
+              <div className="w-1 h-8 bg-violet-600 mb-2"></div>
+              <button
+                className="bg-violet-600 text-white p-2 rounded-lg"
+                onClick={scrollDown}
+              >
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 13l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function Sidebar({ isOpen, toggleSidebar, activeTab, setActiveTab }) {
+      return (
+        <>
+          <div
+            className={`fixed top-0 left-0 h-full w-64 bg-white shadow-xl flex flex-col pt-10 px-6 z-40 sidebar ${
+              isOpen ? 'open' : ''
+            } md:static md:w-48 md:bg-transparent md:shadow-none md:pt-10 md:flex`}
+          >
+            <div className="mb-6 sm:mb-8">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Ara..."
+                  onChange={(e) => window.dispatchEvent(new CustomEvent('search', { detail: e.target.value }))}
+                  className="w-full p-2 sm:p-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 transition text-lg sm:text-xl"
+                />
+                <svg
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 sm:h-5 w-4 sm:w-5 text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <nav className="flex-1 space-y-3 sm:space-y-4">
+              {['Galerimiz', 'İlklerimiz', 'Oyunlar', 'Sana Olan Mesajım'].map((tab) => (
+                <a
+                  key={tab}
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveTab(tab);
+                    toggleSidebar();
+                  }}
+                  className={`block text-violet-700 font-semibold text-xl sm:text-2xl p-2 rounded-lg menu-button ${
+                    activeTab === tab ? 'active bg-white' : ''
+                  }`}
+                >
+                  {tab}
+                </a>
+              ))}
+            </nav>
+            <div className="mt-auto pb-4 sm:pb-6">
+              <p className="text-center text-gray-500 text-sm sm:text-base font-['Dancing_Script']">Made by senibirakmayacakbiri</p>
+            </div>
+          </div>
+          {isOpen && (
+            <div
+              className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+              onClick={toggleSidebar}
+            ></div>
+          )}
+        </>
+      );
+    }
+
+    function FirstsPage() {
+      const [searchTerm, setSearchTerm] = useState('');
+      const photos = [
+        { id: 1, note: 'İlk buluşmamız' },
+        { id: 2, note: 'Deniz kenarında yürüyüş' },
+        { id: 3, note: 'Doğum günü sürprizi' },
+        { id: 4, note: 'Yıldızların altında' },
+        { id: 5, note: 'Gelecek hayallerimiz' },
+      ];
+
+      const filteredPhotos = photos.filter((photo) =>
+        photo.note.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      useEffect(() => {
+        const handleSearch = (e) => {
+          setSearchTerm(e.detail);
+        };
+        window.addEventListener('search', handleSearch);
+        return () => window.removeEventListener('search', handleSearch);
+      }, []);
+
+      const observer = useRef(null);
+      const photoRefs = useRef([]);
+
+      useEffect(() => {
+        observer.current = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+            }
+          });
+        }, { threshold: 0.1 });
+
+        photoRefs.current.forEach((ref) => {
+          if (ref) observer.current.observe(ref);
+        });
+
+        return () => {
+          if (observer.current) observer.current.disconnect();
+        };
+      }, [filteredPhotos]);
+
+      return (
+        <div className="flex-1 flex justify-center py-8 px-4 sm:px-6 md:ml-48">
+          <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border">
+            <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
+              {filteredPhotos.length === 0 ? (
+                <p className="text-center text-gray-700 text Caring for Your Pet in Winter-xl sm:text-2xl">Arama sonucu bulunamadı</p>
+              ) : (
+                filteredPhotos.map((photo, index) => (
+                  <div
+                    key={photo.id}
+                    ref={(el) => (photoRefs.current[index] = el)}
+                    className="fade-up mx-auto w-10/12 sm:w-8/12 md:w-7/12"
+                  >
+                    <div className="bg-black h-48 sm:h-56 md:h-64 rounded-lg mb-3 sm:mb-4 aspect-square mx-auto"></div>
+                    <p className="text-center text-gray-700 font-medium text-xl sm:text-2xl">{photo.note}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function GalleryPage({ openModal, startPreview, endPreview }) {
+      const photos = Array.from({ length: 40 }, (_, index) => ({
+        id: index + 1,
+      }));
+
+      const observer = useRef(null);
+      const photoRefs = useRef([]);
+
+      useEffect(() => {
+        observer.current = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+            }
+          });
+        }, { threshold: 0.1 });
+
+        photoRefs.current.forEach((ref) => {
+          if (ref) observer.current.observe(ref);
+        });
+
+        return () => {
+          if (observer.current) observer.current.disconnect();
+        };
+      }, []);
+
+      return (
+        <div className="flex-1 flex justify-center py-8 px-0 md:ml-48">
+          <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border">
+            <div className="p-4 sm:p-6 md:p-8 right-gap-grid">
+              {photos.map((photo, index) => (
+                <div
+                  key={photo.id}
+                  ref={(el) => (photoRefs.current[index] = el)}
+                  className="fade-up w-full"
+                  onClick={() => openModal(photo.id)}
+                  onMouseDown={() => startPreview(photo.id)}
+                  onMouseUp={endPreview}
+                  onTouchStart={() => startPreview(photo.id)}
+                  onTouchEnd={endPreview}
+                >
+                  <div className="bg-black h-32 sm:h-40 md:h-48 rounded-lg aspect-square"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+    function MemoryGame() {
+  const cardImages = [
+    { src: "foto1.jpg", matched: false },
+    { src: "foto2.jpg", matched: false },
+    { src: "foto3.jpg", matched: false },
+    { src: "foto4.jpg", matched: false },
+    { src: "foto5.jpg", matched: false },
+    { src: "foto6.jpg", matched: false },
+  ];
+
+  const [cards, setCards] = useState([]);
+  const [choiceOne, setChoiceOne] = useState(null);
+  const [choiceTwo, setChoiceTwo] = useState(null);
+  const [disabled, setDisabled] = useState(false);
+  const [completed, setCompleted] = useState(false);
+
+  // oyunu başlat
+  const shuffleCards = () => {
+    const shuffled = [...cardImages, ...cardImages]
+      .sort(() => Math.random() - 0.5)
+      .map((card, index) => ({ ...card, id: index }));
+    setCards(shuffled);
+    setChoiceOne(null);
+    setChoiceTwo(null);
+    setCompleted(false);
   };
 
-  const handlePressEnd = (photo) => {
-    if (pressTimer) {
-      clearTimeout(pressTimer);
-      if (!isPreview) {
-        // kısa tıklama → direkt aç
-        setSelected(photo);
-        setIsPreview(true);
+  // ilk açılışta başlat
+  useEffect(() => {
+    shuffleCards();
+  }, []);
+
+  // seçim kontrolü
+  useEffect(() => {
+    if (choiceOne && choiceTwo) {
+      setDisabled(true);
+      if (choiceOne.src === choiceTwo.src) {
+        setCards(prev =>
+          prev.map(card =>
+            card.src === choiceOne.src ? { ...card, matched: true } : card
+          )
+        );
+        resetTurn();
+      } else {
+        setTimeout(() => resetTurn(), 1000);
       }
+    }
+  }, [choiceOne, choiceTwo]);
+
+  useEffect(() => {
+    if (cards.length && cards.every(card => card.matched)) {
+      setCompleted(true);
+    }
+  }, [cards]);
+
+  const handleChoice = (card) => {
+    if (!disabled) {
+      choiceOne ? setChoiceTwo(card) : setChoiceOne(card);
     }
   };
 
-  return (
-    <div className="grid grid-cols-2 gap-y-6 gap-x-4 place-items-center">
-      {photos.map((photo, i) => (
-        <img
-          key={i}
-          src={photo}
-          alt={`gallery-${i}`}
-          className="w-full max-w-xs rounded-lg shadow-md cursor-pointer object-cover"
-          onMouseDown={() => handlePressStart(photo)}
-          onMouseUp={() => handlePressEnd(photo)}
-          onTouchStart={() => handlePressStart(photo)}
-          onTouchEnd={() => handlePressEnd(photo)}
-        />
-      ))}
+  const resetTurn = () => {
+    setChoiceOne(null);
+    setChoiceTwo(null);
+    setDisabled(false);
+  };
 
-      {/* Önizleme Modal */}
-      {selected && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 transition-opacity duration-500">
-          <div className="relative max-w-3xl w-full">
-            <img
-              src={selected}
-              alt="preview"
-              className={`w-full h-auto rounded-lg shadow-2xl transform transition-opacity duration-500 ${
-                isPreview ? "opacity-100" : "opacity-0"
-              }`}
-            />
-            {/* Geri Butonu */}
-            <button
-              className="absolute top-4 right-4 bg-black bg-opacity-60 text-white p-2 rounded-full hover:bg-opacity-80 transition"
-              onClick={() => {
-                setIsPreview(false);
-                setTimeout(() => setSelected(null), 500); // fade out süresi
-              }}
-            >
-              ⬅
-            </button>
-          </div>
+  return (
+    <div className="flex flex-col items-center space-y-6">
+      <h2 className="text-2xl font-bold text-violet-700">Memory Game 💖</h2>
+      {completed && (
+        <div className="text-green-600 font-semibold text-xl">
+          Tebrikler aşkım 💕 tüm anılarımızı buldun!
         </div>
       )}
+      <button
+        onClick={shuffleCards}
+        className="bg-violet-600 text-white px-4 py-2 rounded-lg hover:bg-violet-700"
+      >
+        Yeniden Başla
+      </button>
+      <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
+        {cards.map(card => (
+          <div
+            key={card.id}
+            className="relative w-24 h-24 sm:w-32 sm:h-32 cursor-pointer"
+            onClick={() => handleChoice(card)}
+          >
+            <img
+              src={card.src}
+              alt="card"
+              className={`absolute inset-0 w-full h-full rounded-lg object-cover transition-transform duration-500 ${
+                card === choiceOne || card === choiceTwo || card.matched
+                  ? "rotate-y-0"
+                  : "rotate-y-180 bg-gray-300"
+              }`}
+            />
+            {!(
+              card === choiceOne ||
+              card === choiceTwo ||
+              card.matched
+            ) && (
+              <div className="absolute inset-0 bg-violet-300 rounded-lg"></div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
