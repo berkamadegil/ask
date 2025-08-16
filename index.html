@@ -87,13 +87,15 @@
       justify-content: center;
       z-index: 50;
       opacity: 0;
-      transition: opacity 0.5s ease-in-out;
+      transition: opacity 0.5s ease-in-out, filter 0.5s ease-in-out;
     }
     .modal.visible {
       opacity: 1;
+      filter: brightness(1);
     }
     .modal.hidden {
       opacity: 0;
+      filter: brightness(0.5);
     }
     .right-gap-grid {
       display: grid;
@@ -112,6 +114,20 @@
       .right-gap-grid > div:nth-child(odd) {
         margin-right: 2.5rem;
       }
+    }
+    @keyframes scaleIn {
+      0% { transform: scale(0.8); opacity: 0; filter: brightness(0.5); }
+      100% { transform: scale(1); opacity: 1; filter: brightness(1); }
+    }
+    @keyframes scaleOut {
+      0% { transform: scale(1); opacity: 1; filter: brightness(1); }
+      100% { transform: scale(0.8); opacity: 0; filter: brightness(0.5); }
+    }
+    .preview-container {
+      animation: scaleIn 0.5s ease-in-out forwards;
+    }
+    .preview-container.hidden {
+      animation: scaleOut 0.5s ease-in-out forwards;
     }
   </style>
 </head>
@@ -185,6 +201,7 @@
       const [previewPhoto, setPreviewPhoto] = useState(null);
       const [modalVisible, setModalVisible] = useState(false);
       const [previewVisible, setPreviewVisible] = useState(false);
+      const [pressTimer, setPressTimer] = useState(null);
 
       const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -200,12 +217,18 @@
         setTimeout(() => setSelectedPhoto(null), 500); // Wait for fade out
       };
 
-      const startPreview = (photoId) => {
-        setPreviewPhoto(photoId);
-        setPreviewVisible(true);
+      const startPreview = (e, photoId) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const timer = setTimeout(() => {
+          setPreviewPhoto(photoId);
+          setPreviewVisible(true);
+        }, 1500);
+        setPressTimer(timer);
       };
 
       const endPreview = () => {
+        if (pressTimer) clearTimeout(pressTimer);
         setPreviewVisible(false);
         setTimeout(() => setPreviewPhoto(null), 500); // Wait for fade out
       };
@@ -244,12 +267,12 @@
           {activeTab === 'İlklerimiz' && <FirstsPage />}
           {activeTab === 'Galerimiz' && <GalleryPage openModal={openModal} startPreview={startPreview} endPreview={endPreview} />}
           {activeTab === 'Oyunlar' && (
-              <div className="flex-1 flex justify-center py-8 px-4 sm:px-6 md:ml-48">
+            <div className="flex-1 flex justify-center py-8 px-4 sm:px-6 md:ml-48">
               <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border p-4 sm:p-6 md:p-8">
-              <MemoryGame />
+                <MemoryGame />
               </div>
-              </div>
-                )}
+            </div>
+          )}
           {activeTab === 'Sana Olan Mesajım' && (
             <div className="flex-1 flex justify-center py-8 px-4 sm:px-6 md:ml-48">
               <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border p-4 sm:p-6 md:p-8">
@@ -272,7 +295,9 @@
           )}
           {previewPhoto && (
             <div className={`modal ${previewVisible ? 'visible' : 'hidden'}`} onMouseUp={endPreview} onTouchEnd={endPreview}>
-              <div className="bg-black h-[80vh] w-full max-w-[90%] sm:max-w-[80%] md:max-w-[70%] rounded-lg mx-auto"></div>
+              <div className={`preview-container w-full max-w-[90%] sm:max-w-[80%] md:max-w-[70%] ${previewVisible ? '' : 'hidden'}`}>
+                <div className="bg-black h-[80vh] w-full rounded-lg mx-auto"></div>
+              </div>
             </div>
           )}
           {(activeTab === 'İlklerimiz' || activeTab === 'Galerimiz') && (
@@ -415,7 +440,7 @@
           <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border">
             <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
               {filteredPhotos.length === 0 ? (
-                <p className="text-center text-gray-700 text Caring for Your Pet in Winter-xl sm:text-2xl">Arama sonucu bulunamadı</p>
+                <p className="text-center text-gray-700 text-xl sm:text-2xl">Arama sonucu bulunamadı</p>
               ) : (
                 filteredPhotos.map((photo, index) => (
                   <div
@@ -434,173 +459,165 @@
       );
     }
 
-function GalleryPage() {
-  const photos = Array.from({ length: 12 }, (_, index) => ({ id: index + 1 }));
-  const [previewPhoto, setPreviewPhoto] = useState(null);
-  const [pressTimer, setPressTimer] = useState(null);
+    function GalleryPage({ openModal, startPreview, endPreview }) {
+      const photos = Array.from({ length: 40 }, (_, index) => ({
+        id: index + 1,
+      }));
 
-  const startPreviewTimer = (e, photo) => {
-    e.stopPropagation();
-    e.preventDefault();
-    const timer = setTimeout(() => setPreviewPhoto(photo), 1500);
-    setPressTimer(timer);
-  };
+      const observer = useRef(null);
+      const photoRefs = useRef([]);
 
-  const cancelPreviewTimer = () => {
-    if (pressTimer) clearTimeout(pressTimer);
-  };
+      useEffect(() => {
+        observer.current = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+            }
+          });
+        }, { threshold: 0.1 });
 
-  const closePreview = () => setPreviewPhoto(null);
+        photoRefs.current.forEach((ref) => {
+          if (ref) observer.current.observe(ref);
+        });
 
-  return (
-    <div className="flex-1 flex justify-center py-8 px-0 overflow-hidden">
-      <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border">
-        <div className="p-4 sm:p-6 md:p-8 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-6 justify-center">
-          {photos.map((photo) => (
-            <div
-              key={photo.id}
-              className="w-full sm:w-32 md:w-36 cursor-pointer relative touch-none"
-              onMouseDown={(e) => startPreviewTimer(e, photo)}
-              onMouseUp={cancelPreviewTimer}
-              onTouchStart={(e) => startPreviewTimer(e, photo)}
-              onTouchEnd={cancelPreviewTimer}
-            >
-              <div className="bg-black h-32 sm:h-36 md:h-40 rounded-lg aspect-square"></div>
+        return () => {
+          if (observer.current) observer.current.disconnect();
+        };
+      }, []);
+
+      return (
+        <div className="flex-1 flex justify-center py-8 px-0 md:ml-48">
+          <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border">
+            <div className="p-4 sm:p-6 md:p-8 right-gap-grid gap-x-6 sm:gap-x-8 gap-y-8 sm:gap-y-10">
+              {photos.map((photo, index) => (
+                <div
+                  key={photo.id}
+                  ref={(el) => (photoRefs.current[index] = el)}
+                  className="fade-up w-full cursor-pointer"
+                  onClick={() => openModal(photo.id)}
+                  onMouseDown={(e) => startPreview(e, photo.id)}
+                  onMouseUp={endPreview}
+                  onTouchStart={(e) => startPreview(e, photo.id)}
+                  onTouchEnd={endPreview}
+                >
+                  <div className="bg-black h-32 sm:h-40 md:h-48 rounded-lg aspect-square"></div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
-
-      {previewPhoto && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 transition-opacity duration-500"
-          onMouseUp={closePreview}
-          onTouchEnd={closePreview}
-        >
-          <div className="bg-white rounded-lg w-80 sm:w-96 h-80 sm:h-96 transform scale-0 animate-scaleIn">
-            <div className="w-full h-full bg-black rounded-lg"></div>
           </div>
         </div>
-      )}
-    </div>
-  );
-}
+      );
+    }
 
     function MemoryGame() {
-  const cardImages = [
-    { src: "foto1.jpg", matched: false },
-    { src: "foto2.jpg", matched: false },
-    { src: "foto3.jpg", matched: false },
-    { src: "foto4.jpg", matched: false },
-    { src: "foto5.jpg", matched: false },
-    { src: "foto6.jpg", matched: false },
-  ];
+      const cardImages = [
+        { src: "foto1.jpg", matched: false },
+        { src: "foto2.jpg", matched: false },
+        { src: "foto3.jpg", matched: false },
+        { src: "foto4.jpg", matched: false },
+        { src: "foto5.jpg", matched: false },
+        { src: "foto6.jpg", matched: false },
+      ];
 
-  const [cards, setCards] = useState([]);
-  const [choiceOne, setChoiceOne] = useState(null);
-  const [choiceTwo, setChoiceTwo] = useState(null);
-  const [disabled, setDisabled] = useState(false);
-  const [completed, setCompleted] = useState(false);
+      const [cards, setCards] = useState([]);
+      const [choiceOne, setChoiceOne] = useState(null);
+      const [choiceTwo, setChoiceTwo] = useState(null);
+      const [disabled, setDisabled] = useState(false);
+      const [completed, setCompleted] = useState(false);
 
-  // oyunu başlat
-  const shuffleCards = () => {
-    const shuffled = [...cardImages, ...cardImages]
-      .sort(() => Math.random() - 0.5)
-      .map((card, index) => ({ ...card, id: index }));
-    setCards(shuffled);
-    setChoiceOne(null);
-    setChoiceTwo(null);
-    setCompleted(false);
-  };
+      const shuffleCards = () => {
+        const shuffled = [...cardImages, ...cardImages]
+          .sort(() => Math.random() - 0.5)
+          .map((card, index) => ({ ...card, id: index }));
+        setCards(shuffled);
+        setChoiceOne(null);
+        setChoiceTwo(null);
+        setCompleted(false);
+      };
 
-  // ilk açılışta başlat
-  useEffect(() => {
-    shuffleCards();
-  }, []);
+      useEffect(() => {
+        shuffleCards();
+      }, []);
 
-  // seçim kontrolü
-  useEffect(() => {
-    if (choiceOne && choiceTwo) {
-      setDisabled(true);
-      if (choiceOne.src === choiceTwo.src) {
-        setCards(prev =>
-          prev.map(card =>
-            card.src === choiceOne.src ? { ...card, matched: true } : card
-          )
-        );
-        resetTurn();
-      } else {
-        setTimeout(() => resetTurn(), 1000);
-      }
-    }
-  }, [choiceOne, choiceTwo]);
+      useEffect(() => {
+        if (choiceOne && choiceTwo) {
+          setDisabled(true);
+          if (choiceOne.src === choiceTwo.src) {
+            setCards(prev =>
+              prev.map(card =>
+                card.src === choiceOne.src ? { ...card, matched: true } : card
+              )
+            );
+            resetTurn();
+          } else {
+            setTimeout(() => resetTurn(), 1000);
+          }
+        }
+      }, [choiceOne, choiceTwo]);
 
-  useEffect(() => {
-    if (cards.length && cards.every(card => card.matched)) {
-      setCompleted(true);
-    }
-  }, [cards]);
+      useEffect(() => {
+        if (cards.length && cards.every(card => card.matched)) {
+          setCompleted(true);
+        }
+      }, [cards]);
 
-  const handleChoice = (card) => {
-    if (!disabled) {
-      choiceOne ? setChoiceTwo(card) : setChoiceOne(card);
-    }
-  };
+      const handleChoice = (card) => {
+        if (!disabled) {
+          choiceOne ? setChoiceTwo(card) : setChoiceOne(card);
+        }
+      };
 
-  const resetTurn = () => {
-    setChoiceOne(null);
-    setChoiceTwo(null);
-    setDisabled(false);
-  };
+      const resetTurn = () => {
+        setChoiceOne(null);
+        setChoiceTwo(null);
+        setDisabled(false);
+      };
 
-  return (
-    <div className="flex flex-col items-center space-y-6">
-      <h2 className="text-2xl font-bold text-violet-700">Memory Game 💖</h2>
-      {completed && (
-        <div className="text-green-600 font-semibold text-xl">
-          Tebrikler aşkım 💕 tüm anılarımızı buldun!
-        </div>
-      )}
-      <button
-        onClick={shuffleCards}
-        className="bg-violet-600 text-white px-4 py-2 rounded-lg hover:bg-violet-700"
-      >
-        Yeniden Başla
-      </button>
-      <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-        {cards.map(card => (
-          <div
-            key={card.id}
-            className="relative w-24 h-24 sm:w-32 sm:h-32 cursor-pointer"
-            onClick={() => handleChoice(card)}
+      return (
+        <div className="flex flex-col items-center space-y-6">
+          <h2 className="text-2xl font-bold text-violet-700">Memory Game 💖</h2>
+          {completed && (
+            <div className="text-green-600 font-semibold text-xl">
+              Tebrikler aşkım 💕 tüm anılarımızı buldun!
+            </div>
+          )}
+          <button
+            onClick={shuffleCards}
+            className="bg-violet-600 text-white px-4 py-2 rounded-lg hover:bg-violet-700"
           >
-            <img
-              src={card.src}
-              alt="card"
-              className={`absolute inset-0 w-full h-full rounded-lg object-cover transition-transform duration-500 ${
-                card === choiceOne || card === choiceTwo || card.matched
-                  ? "rotate-y-0"
-                  : "rotate-y-180 bg-gray-300"
-              }`}
-            />
-            {!(
-              card === choiceOne ||
-              card === choiceTwo ||
-              card.matched
-            ) && (
-              <div className="absolute inset-0 bg-violet-300 rounded-lg"></div>
-            )}
+            Yeniden Başla
+          </button>
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
+            {cards.map(card => (
+              <div
+                key={card.id}
+                className="relative w-24 h-24 sm:w-32 sm:h-32 cursor-pointer"
+                onClick={() => handleChoice(card)}
+              >
+                <img
+                  src={card.src}
+                  alt="card"
+                  className={`absolute inset-0 w-full h-full rounded-lg object-cover transition-transform duration-500 ${
+                    card === choiceOne || card === choiceTwo || card.matched
+                      ? "rotate-y-0"
+                      : "rotate-y-180 bg-gray-300"
+                  }`}
+                />
+                {!(
+                  card === choiceOne ||
+                  card === choiceTwo ||
+                  card.matched
+                ) && (
+                  <div className="absolute inset-0 bg-violet-300 rounded-lg"></div>
+                )}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+        </div>
+      );
+    }
+
     ReactDOM.render(<App />, document.getElementById('root'));
   </script>
 </body>
 </html>
-
-
-
-
