@@ -435,21 +435,14 @@
     }
 
 function GalleryPage() {
-  const photos = Array.from({ length: 12 }, (_, index) => ({
-    id: index + 1,
-  }));
+  const photos = Array.from({ length: 12 }, (_, index) => ({ id: index + 1 }));
+  const [previewPhoto, setPreviewPhoto] = useState(null);
+  const [pressTimer, setPressTimer] = useState(null);
 
-  const [previewPhoto, setPreviewPhoto] = React.useState(null);
-  const [pressTimer, setPressTimer] = React.useState(null);
-
-  // basma başladığında
   const startPreviewTimer = (e, photo) => {
-    // kaydırma ile tetiklememek için yalnızca fare veya parmak basarsa
     e.stopPropagation();
     e.preventDefault();
-    const timer = setTimeout(() => {
-      setPreviewPhoto(photo);
-    }, 500);
+    const timer = setTimeout(() => setPreviewPhoto(photo), 1500);
     setPressTimer(timer);
   };
 
@@ -460,9 +453,9 @@ function GalleryPage() {
   const closePreview = () => setPreviewPhoto(null);
 
   return (
-    <div className="flex-1 flex justify-center py-8 px-0 md:ml-48 overflow-hidden">
+    <div className="flex-1 flex justify-center py-8 px-0 overflow-hidden">
       <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border">
-        <div className="p-4 sm:p-6 md:p-8 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-6 justify-items-center">
+        <div className="p-4 sm:p-6 md:p-8 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-6 justify-center">
           {photos.map((photo) => (
             <div
               key={photo.id}
@@ -478,7 +471,6 @@ function GalleryPage() {
         </div>
       </div>
 
-      {/* Preview modal (animasyonlu) */}
       {previewPhoto && (
         <div
           className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 transition-opacity duration-500"
@@ -493,26 +485,6 @@ function GalleryPage() {
     </div>
   );
 }
-
-// Tailwind animasyonu ekleme
-const style = document.createElement("style");
-style.innerHTML = `
-@keyframes scaleIn {
-  0% { transform: scale(0.7); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
-}
-.animate-scaleIn {
-  animation: scaleIn 0.3s ease forwards;
-}
-
-/* Sayfanın yatay kaydırmasını tamamen kapat */
-body {
-  overflow-x: hidden !important;
-  touch-action: pan-y;
-}
-`;
-document.head.appendChild(style);
-
 
     function MemoryGame() {
   const cardImages = [
@@ -628,6 +600,7 @@ document.head.appendChild(style);
   </script>
 </body>
 </html>
+
 
 
 
