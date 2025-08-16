@@ -207,8 +207,8 @@
         setIsSidebarOpen(!isSidebarOpen);
       };
 
-      const openModal = (photoId) => {
-        setSelectedPhoto(photoId);
+      const openModal = (photoUrl) => {
+        setSelectedPhoto(photoUrl);
         setModalVisible(true);
       };
 
@@ -217,11 +217,11 @@
         setTimeout(() => setSelectedPhoto(null), 500); // Wait for fade out
       };
 
-      const startPreview = (e, photoId) => {
+      const startPreview = (e, photoUrl) => {
         e.stopPropagation();
         e.preventDefault();
         const timer = setTimeout(() => {
-          setPreviewPhoto(photoId);
+          setPreviewPhoto(photoUrl);
           setPreviewVisible(true);
         }, 1500);
         setPressTimer(timer);
@@ -289,14 +289,22 @@
                 >
                   Geri
                 </button>
-                <div className="bg-black h-[80vh] w-full rounded-lg mx-auto"></div>
+                <img
+                  src={selectedPhoto}
+                  alt="Full screen"
+                  className="h-[80vh] w-full rounded-lg mx-auto object-cover"
+                />
               </div>
             </div>
           )}
           {previewPhoto && (
             <div className={`modal ${previewVisible ? 'visible' : 'hidden'}`} onMouseUp={endPreview} onTouchEnd={endPreview}>
               <div className={`preview-container w-full max-w-[90%] sm:max-w-[80%] md:max-w-[70%] ${previewVisible ? '' : 'hidden'}`}>
-                <div className="bg-black h-[80vh] w-full rounded-lg mx-auto"></div>
+                <img
+                  src={previewPhoto}
+                  alt="Preview"
+                  className="h-[80vh] w-full rounded-lg mx-auto object-cover"
+                />
               </div>
             </div>
           )}
@@ -395,11 +403,11 @@
     function FirstsPage() {
       const [searchTerm, setSearchTerm] = useState('');
       const photos = [
-        { id: 1, note: 'İlk buluşmamız' },
-        { id: 2, note: 'Deniz kenarında yürüyüş' },
-        { id: 3, note: 'Doğum günü sürprizi' },
-        { id: 4, note: 'Yıldızların altında' },
-        { id: 5, note: 'Gelecek hayallerimiz' },
+        { id: 1, note: 'İlk buluşmamız', url: 'https://i.ibb.co/PLACEHOLDER/foto1.jpg' },
+        { id: 2, note: 'Deniz kenarında yürüyüş', url: 'https://i.ibb.co/PLACEHOLDER/foto2.jpg' },
+        { id: 3, note: 'Doğum günü sürprizi', url: 'https://i.ibb.co/PLACEHOLDER/foto3.jpg' },
+        { id: 4, note: 'Yıldızların altında', url: 'https://i.ibb.co/PLACEHOLDER/foto4.jpg' },
+        { id: 5, note: 'Gelecek hayallerimiz', url: 'https://i.ibb.co/PLACEHOLDER/foto5.jpg' },
       ];
 
       const filteredPhotos = photos.filter((photo) =>
@@ -448,7 +456,11 @@
                     ref={(el) => (photoRefs.current[index] = el)}
                     className="fade-up mx-auto w-10/12 sm:w-8/12 md:w-7/12"
                   >
-                    <div className="bg-black h-48 sm:h-56 md:h-64 rounded-lg mb-3 sm:mb-4 aspect-square mx-auto"></div>
+                    <img
+                      src={photo.url}
+                      alt={photo.note}
+                      className="h-48 sm:h-56 md:h-64 rounded-lg mb-3 sm:mb-4 aspect-square mx-auto object-cover"
+                    />
                     <p className="text-center text-gray-700 font-medium text-xl sm:text-2xl">{photo.note}</p>
                   </div>
                 ))
@@ -460,9 +472,14 @@
     }
 
     function GalleryPage({ openModal, startPreview, endPreview }) {
-      const photos = Array.from({ length: 40 }, (_, index) => ({
-        id: index + 1,
-      }));
+      const photos = [
+        { id: 1, url: 'https://i.ibb.co/PLACEHOLDER/galeri-foto1.jpg' },
+        { id: 2, url: 'https://i.ibb.co/PLACEHOLDER/galeri-foto2.jpg' },
+        { id: 3, url: 'https://i.ibb.co/PLACEHOLDER/galeri-foto3.jpg' },
+        { id: 4, url: 'https://i.ibb.co/PLACEHOLDER/galeri-foto4.jpg' },
+        { id: 5, url: 'https://i.ibb.co/PLACEHOLDER/galeri-foto5.jpg' },
+        // Add more up to 40 photos with your ImgBB URLs
+      ];
 
       const observer = useRef(null);
       const photoRefs = useRef([]);
@@ -494,13 +511,17 @@
                   key={photo.id}
                   ref={(el) => (photoRefs.current[index] = el)}
                   className="fade-up w-full cursor-pointer"
-                  onClick={() => openModal(photo.id)}
-                  onMouseDown={(e) => startPreview(e, photo.id)}
+                  onClick={() => openModal(photo.url)}
+                  onMouseDown={(e) => startPreview(e, photo.url)}
                   onMouseUp={endPreview}
-                  onTouchStart={(e) => startPreview(e, photo.id)}
+                  onTouchStart={(e) => startPreview(e, photo.url)}
                   onTouchEnd={endPreview}
                 >
-                  <div className="bg-black h-32 sm:h-40 md:h-48 rounded-lg aspect-square"></div>
+                  <img
+                    src={photo.url}
+                    alt={`Photo ${photo.id}`}
+                    className="h-32 sm:h-40 md:h-48 rounded-lg aspect-square object-cover"
+                  />
                 </div>
               ))}
             </div>
@@ -511,12 +532,12 @@
 
     function MemoryGame() {
       const cardImages = [
-        { src: "foto1.jpg", matched: false },
-        { src: "foto2.jpg", matched: false },
-        { src: "foto3.jpg", matched: false },
-        { src: "foto4.jpg", matched: false },
-        { src: "foto5.jpg", matched: false },
-        { src: "foto6.jpg", matched: false },
+        { src: 'https://i.ibb.co/C3z99tnh/1755385460141-1.jpg', matched: false },
+        { src: 'https://i.ibb.co/PLACEHOLDER/oyun-foto2.jpg', matched: false },
+        { src: 'https://i.ibb.co/PLACEHOLDER/oyun-foto3.jpg', matched: false },
+        { src: 'https://i.ibb.co/PLACEHOLDER/oyun-foto4.jpg', matched: false },
+        { src: 'https://i.ibb.co/PLACEHOLDER/oyun-foto5.jpg', matched: false },
+        { src: 'https://i.ibb.co/PLACEHOLDER/oyun-foto6.jpg', matched: false },
       ];
 
       const [cards, setCards] = useState([]);
