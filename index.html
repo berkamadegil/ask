@@ -6,13 +6,46 @@
   <title>Aşk Sitemiz</title>
   <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/babel-standalone@7.24.7/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.24.7/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .animated-border {
+      position: relative;
+      z-index: 0;
+    }
+    .animated-border::before {
+      content: '';
+      position: absolute;
+      top: -12px;
+      left: -12px;
+      right: -12px;
+      bottom: -12px;
+      background: linear-gradient(270deg, #f472b6, #a78bfa, #ffffff, #f472b6);
+      background-size: 400% 400%;
+      animation: gradientAnimation 15s ease infinite;
+      z-index: -1;
+      border-radius: 12px;
+    }
+    .fade-up {
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
 </head>
 <body>
   <div id="root"></div>
   <script type="text/babel">
-    const { useState } = React;
+    const { useState, useEffect, useRef } = React;
 
     function App() {
       const [username, setUsername] = useState('');
@@ -31,11 +64,7 @@
       };
 
       if (isLoggedIn) {
-        return (
-          <div className="min-h-screen bg-gradient-to-br from-rose-100 to-violet-200 flex items-center justify-center">
-            <h1 className="text-5xl font-extrabold text-violet-700 animate-pulse">Merhaba</h1>
-          </div>
-        );
+        return <MainLayout />;
       }
 
       return (
@@ -43,7 +72,7 @@
           <div className="bg-white p-10 rounded-2xl shadow-2xl w-full max-w-sm">
             <h2 className="text-3xl font-bold text-center text-violet-700 mb-8">Giriş Yap</h2>
             {error && <p className="text-red-500 text-center mb-6 font-medium">{error}</p>}
-            <div className="space-y-6">
+            <form onSubmit={handleLogin} className="space-y-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Kullanıcı Adı</label>
                 <input
@@ -65,11 +94,114 @@
                 />
               </div>
               <button
-                onClick={handleLogin}
+                type="submit"
                 className="w-full bg-violet-600 text-white py-3 rounded-lg hover:bg-violet-700 transition duration-300 font-semibold"
               >
                 Giriş Yap
               </button>
+            </form>
+          </div>
+        </div>
+      );
+    }
+
+    function MainLayout() {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-rose-100 to-violet-200 flex">
+          <Sidebar />
+          <GalleryPage />
+        </div>
+      );
+    }
+
+    function Sidebar() {
+      return (
+        <div className="fixed top-0 left-0 h-full w-64 bg-white shadow-xl flex flex-col pt-10 px-6">
+          <div className="mb-8">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Ara..."
+                className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 transition"
+              />
+              <svg
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </div>
+          </div>
+          <nav className="space-y-4">
+            <a href="#" className="block text-violet-700 font-semibold hover:text-violet-900 transition">
+              Galerimiz
+            </a>
+            <a href="#" className="block text-violet-700 font-semibold hover:text-violet-900 transition">
+              İlklerimiz
+            </a>
+            <a href="#" className="block text-violet-700 font-semibold hover:text-violet-900 transition">
+              Oyunlar
+            </a>
+            <a href="#" className="block text-violet-700 font-semibold hover:text-violet-900 transition">
+              Sana Olan Mesajım
+            </a>
+          </nav>
+        </div>
+      );
+    }
+
+    function GalleryPage() {
+      const photos = [
+        { id: 1, note: 'İlk buluşmamız' },
+        { id: 2, note: 'Deniz kenarında yürüyüş' },
+        { id: 3, note: 'Doğum günü sürprizi' },
+        { id: 4, note: 'Yıldızların altında' },
+        { id: 5, note: 'Gelecek hayallerimiz' },
+      ];
+
+      const observer = useRef(null);
+      const photoRefs = useRef([]);
+
+      useEffect(() => {
+        observer.current = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+            }
+          });
+        }, { threshold: 0.1 });
+
+        photoRefs.current.forEach((ref) => {
+          if (ref) observer.current.observe(ref);
+        });
+
+        return () => {
+          if (observer.current) observer.current.disconnect();
+        };
+      }, []);
+
+      return (
+        <div className="flex-1 flex justify-center py-10 ml-64">
+          <div className="w-3/5 bg-white rounded-lg shadow-xl animated-border">
+            <div className="p-8 space-y-12">
+              {photos.map((photo, index) => (
+                <div
+                  key={photo.id}
+                  ref={(el) => (photoRefs.current[index] = el)}
+                  className="fade-up mx-auto w-4/5"
+                >
+                  <div className="bg-black h-64 rounded-lg mb-4"></div>
+                  <p className="text-center text-gray-700 font-medium">{photo.note}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
