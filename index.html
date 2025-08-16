@@ -86,6 +86,14 @@
       align-items: center;
       justify-content: center;
       z-index: 50;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+    .preview-modal.visible {
+      opacity: 1;
+    }
+    .preview-modal.hidden {
+      opacity: 0;
     }
   </style>
 </head>
@@ -157,6 +165,7 @@
       const [activeTab, setActiveTab] = useState('İlklerimiz');
       const [selectedPhoto, setSelectedPhoto] = useState(null);
       const [previewPhoto, setPreviewPhoto] = useState(null);
+      const [previewVisible, setPreviewVisible] = useState(false);
 
       const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -172,10 +181,16 @@
 
       const startPreview = (photoId) => {
         setPreviewPhoto(photoId);
+        setPreviewVisible(true);
       };
 
       const endPreview = () => {
-        setPreviewPhoto(null);
+        setPreviewVisible(false);
+        setTimeout(() => setPreviewPhoto(null), 500); // Wait for fade out
+      };
+
+      const scrollDown = () => {
+        window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
       };
 
       return (
@@ -235,8 +250,32 @@
             </div>
           )}
           {previewPhoto && (
-            <div className="preview-modal" onMouseUp={endPreview} onTouchEnd={endPreview}>
+            <div className={`preview-modal ${previewVisible ? 'visible' : 'hidden'}`} onMouseUp={endPreview} onTouchEnd={endPreview}>
               <div className="bg-black h-96 w-96 rounded-lg"></div>
+            </div>
+          )}
+          {activeTab === 'Galerimiz' && (
+            <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center">
+              <div className="w-1 h-8 bg-violet-600 mb-2"></div>
+              <button
+                className="bg-violet-600 text-white p-2 rounded-lg"
+                onClick={scrollDown}
+              >
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 13l-7 7-7-7"
+                  />
+                </svg>
+              </button>
             </div>
           )}
         </div>
@@ -403,17 +442,13 @@
       return (
         <div className="flex-1 flex justify-center py-8 px-4 sm:px-6 md:ml-48">
           <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border">
-            <div className="p-4 sm:p-6 md:p-8 grid grid-cols-2 gap-4 sm:gap-6">
+            <div className="p-4 sm:p-6 md:p-8 grid grid-cols-2 gap-4 sm:gap-6 justify-items-center">
               {photos.map((photo, index) => (
                 <div
                   key={photo.id}
                   ref={(el) => (photoRefs.current[index] = el)}
-                  className="fade-up cursor-pointer"
+                  className="fade-up cursor-pointer w-full max-w-[calc(50%-0.5rem)] sm:max-w-[calc(50%-1rem)]"
                   onClick={() => openModal(photo.id)}
-                  onMouseDown={() => startPreview(photo.id)}
-                  onMouseUp={endPreview}
-                  onTouchStart={() => startPreview(photo.id)}
-                  onTouchEnd={endPreview}
                 >
                   <div className="bg-black h-32 sm:h-40 md:h-48 rounded-lg aspect-square"></div>
                 </div>
