@@ -434,19 +434,18 @@
       );
     }
 
-    function GalleryPage() {
+function GalleryPage() {
   const photos = Array.from({ length: 12 }, (_, index) => ({
     id: index + 1,
   }));
 
   const [previewPhoto, setPreviewPhoto] = React.useState(null);
-  const [modalPhoto, setModalPhoto] = React.useState(null);
   const [pressTimer, setPressTimer] = React.useState(null);
 
   const startPreviewTimer = (photo) => {
     const timer = setTimeout(() => {
       setPreviewPhoto(photo);
-    }, 300); // 1.5 saniye basınca preview
+    }, 1500); // 1.5 saniye basınca preview
     setPressTimer(timer);
   };
 
@@ -454,12 +453,7 @@
     if (pressTimer) clearTimeout(pressTimer);
   };
 
-  const handleClick = (photo) => {
-    setModalPhoto(photo); // Tek tık kalıcı modal
-  };
-
   const closePreview = () => setPreviewPhoto(null);
-  const closeModal = () => setModalPhoto(null);
 
   return (
     <div className="flex-1 flex justify-center py-8 px-0 md:ml-48">
@@ -470,15 +464,9 @@
               key={photo.id}
               className="w-full sm:w-32 md:w-36 cursor-pointer relative"
               onMouseDown={() => startPreviewTimer(photo)}
-              onMouseUp={() => {
-                cancelPreviewTimer();
-                if (!previewPhoto) handleClick(photo);
-              }}
+              onMouseUp={cancelPreviewTimer}
               onTouchStart={() => startPreviewTimer(photo)}
-              onTouchEnd={() => {
-                cancelPreviewTimer();
-                if (!previewPhoto) handleClick(photo);
-              }}
+              onTouchEnd={cancelPreviewTimer}
             >
               <div className="bg-black h-32 sm:h-36 md:h-40 rounded-lg aspect-square"></div>
             </div>
@@ -494,18 +482,6 @@
           onTouchEnd={closePreview}
         >
           <div className="bg-white rounded-lg w-80 sm:w-96 h-80 sm:h-96 transform scale-0 animate-scaleIn">
-            <div className="w-full h-full bg-black rounded-lg"></div>
-          </div>
-        </div>
-      )}
-
-      {/* Kalıcı modal */}
-      {modalPhoto && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
-          onClick={closeModal}
-        >
-          <div className="bg-white rounded-lg w-80 sm:w-96 h-80 sm:h-96">
             <div className="w-full h-full bg-black rounded-lg"></div>
           </div>
         </div>
@@ -641,3 +617,4 @@ document.head.appendChild(style);
   </script>
 </body>
 </html>
+
