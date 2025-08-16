@@ -192,6 +192,10 @@
         setTimeout(() => setPreviewPhoto(null), 500); // Wait for fade out
       };
 
+      const scrollDown = () => {
+        window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+      };
+
       return (
         <div className="min-h-screen bg-gradient-to-br from-rose-100 to-violet-200 flex flex-col">
           <button
@@ -251,6 +255,30 @@
           {previewPhoto && (
             <div className={`modal ${previewVisible ? 'visible' : 'hidden'}`} onMouseUp={endPreview} onTouchEnd={endPreview}>
               <div className="bg-black h-96 w-96 rounded-lg mx-auto"></div>
+            </div>
+          )}
+          {(activeTab === 'İlklerimiz' || activeTab === 'Galerimiz') && (
+            <div className="fixed right-4 top-1/2 transform -translate-y-1/2 z-50 flex flex-col items-center">
+              <div className="w-1 h-8 bg-violet-600 mb-2"></div>
+              <button
+                className="bg-violet-600 text-white p-2 rounded-lg"
+                onClick={scrollDown}
+              >
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 13l-7 7-7-7"
+                  />
+                </svg>
+              </button>
             </div>
           )}
         </div>
@@ -375,7 +403,7 @@
                   <div
                     key={photo.id}
                     ref={(el) => (photoRefs.current[index] = el)}
-                    className="fade-up mx-auto w-10/12 sm:w-8/12 md:w-7/12 flex justify-center"
+                    className={`fade-up w-10/12 sm:w-8/12 md:w-7/12 ${index % 2 === 0 ? 'ml-auto' : 'mr-auto'}`}
                   >
                     <div className="bg-black h-48 sm:h-56 md:h-64 rounded-lg mb-3 sm:mb-4 aspect-square"></div>
                     <p className="text-center text-gray-700 font-medium text-xl sm:text-2xl">{photo.note}</p>
@@ -415,14 +443,14 @@
       }, []);
 
       return (
-        <div className="flex-1 flex justify-center py-8 px-4 sm:px-6 md:ml-48">
+        <div className="flex-1 flex justify-center py-8 px-0 md:ml-48">
           <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border">
-            <div className="p-4 sm:p-6 md:p-8 grid grid-cols-2 gap-4 sm:gap-6 justify-items-center">
+            <div className="p-4 sm:p-6 md:p-8 grid grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-4 sm:gap-y-6 justify-items-center">
               {photos.map((photo, index) => (
                 <div
                   key={photo.id}
                   ref={(el) => (photoRefs.current[index] = el)}
-                  className="fade-up w-[calc(50%-0.5rem)] sm:w-[calc(50%-1rem)] md:w-[calc(50%-1.5rem)]"
+                  className="fade-up w-1/2"
                   onClick={() => openModal(photo.id)}
                   onMouseDown={() => startPreview(photo.id)}
                   onMouseUp={endPreview}
