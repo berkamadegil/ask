@@ -75,6 +75,18 @@
     body {
       font-family: 'Raleway', sans-serif;
     }
+    .preview-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
   </style>
 </head>
 <body>
@@ -143,9 +155,27 @@
     function MainLayout() {
       const [isSidebarOpen, setIsSidebarOpen] = useState(false);
       const [activeTab, setActiveTab] = useState('İlklerimiz');
+      const [selectedPhoto, setSelectedPhoto] = useState(null);
+      const [previewPhoto, setPreviewPhoto] = useState(null);
 
       const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
+      };
+
+      const openModal = (photoId) => {
+        setSelectedPhoto(photoId);
+      };
+
+      const closeModal = () => {
+        setSelectedPhoto(null);
+      };
+
+      const startPreview = (photoId) => {
+        setPreviewPhoto(photoId);
+      };
+
+      const endPreview = () => {
+        setPreviewPhoto(null);
       };
 
       return (
@@ -176,7 +206,7 @@
             setActiveTab={setActiveTab}
           />
           {activeTab === 'İlklerimiz' && <FirstsPage />}
-          {activeTab === 'Galerimiz' && <GalleryPage />}
+          {activeTab === 'Galerimiz' && <GalleryPage openModal={openModal} startPreview={startPreview} endPreview={endPreview} />}
           {activeTab === 'Oyunlar' && (
             <div className="flex-1 flex justify-center py-8 px-4 sm:px-6 md:ml-48">
               <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border p-4 sm:p-6 md:p-8">
@@ -189,6 +219,24 @@
               <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border p-4 sm:p-6 md:p-8">
                 <h2 className="text-2xl sm:text-3xl text-violet-700 text-center">Sana Olan Mesajım (Yakında!)</h2>
               </div>
+            </div>
+          )}
+          {selectedPhoto && (
+            <div className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+              <div className="relative">
+                <button
+                  className="absolute top-4 left-4 text-white text-2xl"
+                  onClick={closeModal}
+                >
+                  Geri
+                </button>
+                <div className="bg-black h-96 w-96 rounded-lg"></div>
+              </div>
+            </div>
+          )}
+          {previewPhoto && (
+            <div className="preview-modal" onMouseUp={endPreview} onTouchEnd={endPreview}>
+              <div className="bg-black h-96 w-96 rounded-lg"></div>
             </div>
           )}
         </div>
@@ -315,7 +363,7 @@
                     ref={(el) => (photoRefs.current[index] = el)}
                     className="fade-up mx-auto w-10/12 sm:w-8/12 md:w-7/12"
                   >
-                    <div className="bg-black h-48 sm:h-56 md:h-64 rounded-lg mb-3 sm:mb-4 aspect-square"></div>
+                    <div className="bg-black h-48 sm:h-56 md:h-64 rounded-lg mb-3 sm:mb-4 aspect-square mx-auto"></div>
                     <p className="text-center text-gray-700 font-medium text-xl sm:text-2xl">{photo.note}</p>
                   </div>
                 ))
@@ -326,7 +374,7 @@
       );
     }
 
-    function GalleryPage() {
+    function GalleryPage({ openModal, startPreview, endPreview }) {
       const photos = Array.from({ length: 40 }, (_, index) => ({
         id: index + 1,
       }));
@@ -355,14 +403,19 @@
       return (
         <div className="flex-1 flex justify-center py-8 px-4 sm:px-6 md:ml-48">
           <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border">
-            <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
+            <div className="p-4 sm:p-6 md:p-8 grid grid-cols-2 gap-4 sm:gap-6">
               {photos.map((photo, index) => (
                 <div
                   key={photo.id}
                   ref={(el) => (photoRefs.current[index] = el)}
-                  className={`fade-up w-10/12 sm:w-8/12 md:w-7/12 ${index % 2 === 0 ? 'ml-auto' : 'mr-auto'}`}
+                  className="fade-up cursor-pointer"
+                  onClick={() => openModal(photo.id)}
+                  onMouseDown={() => startPreview(photo.id)}
+                  onMouseUp={endPreview}
+                  onTouchStart={() => startPreview(photo.id)}
+                  onTouchEnd={endPreview}
                 >
-                  <div className="bg-black h-48 sm:h-56 md:h-64 rounded-lg mb-3 sm:mb-4 aspect-square"></div>
+                  <div className="bg-black h-32 sm:h-40 md:h-48 rounded-lg aspect-square"></div>
                 </div>
               ))}
             </div>
