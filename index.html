@@ -95,6 +95,24 @@
     .modal.hidden {
       opacity: 0;
     }
+    .right-gap-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0;
+    }
+    .right-gap-grid > div:nth-child(odd) {
+      margin-right: 1rem;
+    }
+    @media (min-width: 640px) {
+      .right-gap-grid > div:nth-child(odd) {
+        margin-right: 1.5rem;
+      }
+    }
+    @media (min-width: 768px) {
+      .right-gap-grid > div:nth-child(odd) {
+        margin-right: 2rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -403,9 +421,9 @@
                   <div
                     key={photo.id}
                     ref={(el) => (photoRefs.current[index] = el)}
-                    className={`fade-up w-10/12 sm:w-8/12 md:w-7/12 ${index % 2 === 0 ? 'ml-auto' : 'mr-auto'}`}
+                    className="fade-up mx-auto w-10/12 sm:w-8/12 md:w-7/12"
                   >
-                    <div className="bg-black h-48 sm:h-56 md:h-64 rounded-lg mb-3 sm:mb-4 aspect-square"></div>
+                    <div className="bg-black h-48 sm:h-56 md:h-64 rounded-lg mb-3 sm:mb-4 aspect-square mx-auto"></div>
                     <p className="text-center text-gray-700 font-medium text-xl sm:text-2xl">{photo.note}</p>
                   </div>
                 ))
@@ -445,12 +463,12 @@
       return (
         <div className="flex-1 flex justify-center py-8 px-0 md:ml-48">
           <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border">
-            <div className="p-4 sm:p-6 md:p-8 grid grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-4 sm:gap-y-6 justify-items-center">
+            <div className="p-4 sm:p-6 md:p-8 right-gap-grid">
               {photos.map((photo, index) => (
                 <div
                   key={photo.id}
                   ref={(el) => (photoRefs.current[index] = el)}
-                  className="fade-up w-1/2"
+                  className="fade-up w-full"
                   onClick={() => openModal(photo.id)}
                   onMouseDown={() => startPreview(photo.id)}
                   onMouseUp={endPreview}
