@@ -75,7 +75,7 @@
     body {
       font-family: 'Raleway', sans-serif;
     }
-    .preview-modal {
+    .modal {
       position: fixed;
       top: 0;
       left: 0;
@@ -89,10 +89,10 @@
       opacity: 0;
       transition: opacity 0.5s ease-in-out;
     }
-    .preview-modal.visible {
+    .modal.visible {
       opacity: 1;
     }
-    .preview-modal.hidden {
+    .modal.hidden {
       opacity: 0;
     }
   </style>
@@ -165,6 +165,7 @@
       const [activeTab, setActiveTab] = useState('İlklerimiz');
       const [selectedPhoto, setSelectedPhoto] = useState(null);
       const [previewPhoto, setPreviewPhoto] = useState(null);
+      const [modalVisible, setModalVisible] = useState(false);
       const [previewVisible, setPreviewVisible] = useState(false);
 
       const toggleSidebar = () => {
@@ -173,10 +174,12 @@
 
       const openModal = (photoId) => {
         setSelectedPhoto(photoId);
+        setModalVisible(true);
       };
 
       const closeModal = () => {
-        setSelectedPhoto(null);
+        setModalVisible(false);
+        setTimeout(() => setSelectedPhoto(null), 500); // Wait for fade out
       };
 
       const startPreview = (photoId) => {
@@ -187,10 +190,6 @@
       const endPreview = () => {
         setPreviewVisible(false);
         setTimeout(() => setPreviewPhoto(null), 500); // Wait for fade out
-      };
-
-      const scrollDown = () => {
-        window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
       };
 
       return (
@@ -237,7 +236,7 @@
             </div>
           )}
           {selectedPhoto && (
-            <div className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+            <div className={`modal ${modalVisible ? 'visible' : 'hidden'}`}>
               <div className="relative">
                 <button
                   className="absolute top-4 left-4 text-white text-2xl"
@@ -245,37 +244,13 @@
                 >
                   Geri
                 </button>
-                <div className="bg-black h-96 w-96 rounded-lg"></div>
+                <div className="bg-black h-96 w-96 rounded-lg mx-auto"></div>
               </div>
             </div>
           )}
           {previewPhoto && (
-            <div className={`preview-modal ${previewVisible ? 'visible' : 'hidden'}`} onMouseUp={endPreview} onTouchEnd={endPreview}>
-              <div className="bg-black h-96 w-96 rounded-lg"></div>
-            </div>
-          )}
-          {activeTab === 'Galerimiz' && (
-            <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center">
-              <div className="w-1 h-8 bg-violet-600 mb-2"></div>
-              <button
-                className="bg-violet-600 text-white p-2 rounded-lg"
-                onClick={scrollDown}
-              >
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 13l-7 7-7-7"
-                  />
-                </svg>
-              </button>
+            <div className={`modal ${previewVisible ? 'visible' : 'hidden'}`} onMouseUp={endPreview} onTouchEnd={endPreview}>
+              <div className="bg-black h-96 w-96 rounded-lg mx-auto"></div>
             </div>
           )}
         </div>
@@ -400,9 +375,9 @@
                   <div
                     key={photo.id}
                     ref={(el) => (photoRefs.current[index] = el)}
-                    className="fade-up mx-auto w-10/12 sm:w-8/12 md:w-7/12"
+                    className="fade-up mx-auto w-10/12 sm:w-8/12 md:w-7/12 flex justify-center"
                   >
-                    <div className="bg-black h-48 sm:h-56 md:h-64 rounded-lg mb-3 sm:mb-4 aspect-square mx-auto"></div>
+                    <div className="bg-black h-48 sm:h-56 md:h-64 rounded-lg mb-3 sm:mb-4 aspect-square"></div>
                     <p className="text-center text-gray-700 font-medium text-xl sm:text-2xl">{photo.note}</p>
                   </div>
                 ))
@@ -447,8 +422,12 @@
                 <div
                   key={photo.id}
                   ref={(el) => (photoRefs.current[index] = el)}
-                  className="fade-up cursor-pointer w-full max-w-[calc(50%-0.5rem)] sm:max-w-[calc(50%-1rem)]"
+                  className="fade-up w-[calc(50%-0.5rem)] sm:w-[calc(50%-1rem)] md:w-[calc(50%-1.5rem)]"
                   onClick={() => openModal(photo.id)}
+                  onMouseDown={() => startPreview(photo.id)}
+                  onMouseUp={endPreview}
+                  onTouchStart={() => startPreview(photo.id)}
+                  onTouchEnd={endPreview}
                 >
                   <div className="bg-black h-32 sm:h-40 md:h-48 rounded-lg aspect-square"></div>
                 </div>
