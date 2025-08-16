@@ -113,6 +113,17 @@
         margin-right: 2.5rem;
       }
     }
+
+    /* Preview modal animasyon */
+    .preview-modal {
+      opacity: 0;
+      transform: scale(0.9);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .preview-modal.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
   </style>
 </head>
 <body>
@@ -182,9 +193,11 @@
       const [isSidebarOpen, setIsSidebarOpen] = useState(false);
       const [activeTab, setActiveTab] = useState('İlklerimiz');
       const [selectedPhoto, setSelectedPhoto] = useState(null);
-      const [previewPhoto, setPreviewPhoto] = useState(null);
       const [modalVisible, setModalVisible] = useState(false);
+
+      const [previewPhoto, setPreviewPhoto] = useState(null);
       const [previewVisible, setPreviewVisible] = useState(false);
+      const previewTimer = useRef(null);
 
       const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -197,17 +210,24 @@
 
       const closeModal = () => {
         setModalVisible(false);
-        setTimeout(() => setSelectedPhoto(null), 500); // Wait for fade out
+        setTimeout(() => setSelectedPhoto(null), 500);
       };
 
-      const startPreview = (photoId) => {
-        setPreviewPhoto(photoId);
-        setPreviewVisible(true);
+      const startPreview = (photoId, longPress = false) => {
+        if (longPress) {
+          previewTimer.current = setTimeout(() => {
+            setPreviewPhoto(photoId);
+            setPreviewVisible(true);
+          }, 1500);
+        } else {
+          openModal(photoId);
+        }
       };
 
       const endPreview = () => {
+        clearTimeout(previewTimer.current);
         setPreviewVisible(false);
-        setTimeout(() => setPreviewPhoto(null), 500); // Wait for fade out
+        setTimeout(() => setPreviewPhoto(null), 400);
       };
 
       const scrollDown = () => {
@@ -227,12 +247,7 @@
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
           <Sidebar
@@ -244,12 +259,12 @@
           {activeTab === 'İlklerimiz' && <FirstsPage />}
           {activeTab === 'Galerimiz' && <GalleryPage openModal={openModal} startPreview={startPreview} endPreview={endPreview} />}
           {activeTab === 'Oyunlar' && (
-              <div className="flex-1 flex justify-center py-8 px-4 sm:px-6 md:ml-48">
+            <div className="flex-1 flex justify-center py-8 px-4 sm:px-6 md:ml-48">
               <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border p-4 sm:p-6 md:p-8">
-              <MemoryGame />
+                <MemoryGame />
               </div>
-              </div>
-                )}
+            </div>
+          )}
           {activeTab === 'Sana Olan Mesajım' && (
             <div className="flex-1 flex justify-center py-8 px-4 sm:px-6 md:ml-48">
               <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border p-4 sm:p-6 md:p-8">
@@ -257,6 +272,8 @@
               </div>
             </div>
           )}
+
+          {/* Kalıcı modal */}
           {selectedPhoto && (
             <div className={`modal ${modalVisible ? 'visible' : 'hidden'}`}>
               <div className="relative w-full max-w-[90%] sm:max-w-[80%] md:max-w-[70%]">
@@ -266,15 +283,28 @@
                 >
                   Geri
                 </button>
-                <div className="bg-black h-[80vh] w-full rounded-lg mx-auto"></div>
+                <img
+                  src={`foto${selectedPhoto}.jpg`}
+                  alt="anımız"
+                  className="w-full h-[80vh] object-contain rounded-lg"
+                />
               </div>
             </div>
           )}
+
+          {/* Geçici animasyonlu preview */}
           {previewPhoto && (
-            <div className={`modal ${previewVisible ? 'visible' : 'hidden'}`} onMouseUp={endPreview} onTouchEnd={endPreview}>
-              <div className="bg-black h-[80vh] w-full max-w-[90%] sm:max-w-[80%] md:max-w-[70%] rounded-lg mx-auto"></div>
+            <div className={`modal ${previewVisible ? 'visible' : 'hidden'}`}>
+              <div className="preview-modal visible bg-black/80 flex items-center justify-center w-full h-full">
+                <img
+                  src={`foto${previewPhoto}.jpg`}
+                  alt="önizleme"
+                  className="max-h-[80vh] max-w-[90%] sm:max-w-[80%] md:max-w-[70%] rounded-lg shadow-2xl"
+                />
+              </div>
             </div>
           )}
+
           {(activeTab === 'İlklerimiz' || activeTab === 'Galerimiz') && (
             <div className="fixed right-4 top-1/2 transform -translate-y-1/2 z-50 flex flex-col items-center">
               <div className="w-1 h-8 bg-violet-600 mb-2"></div>
@@ -289,12 +319,7 @@
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 13l-7 7-7-7"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 13l-7 7-7-7" />
                 </svg>
               </button>
             </div>
@@ -326,12 +351,7 @@
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
             </div>
@@ -367,73 +387,6 @@
       );
     }
 
-    function FirstsPage() {
-      const [searchTerm, setSearchTerm] = useState('');
-      const photos = [
-        { id: 1, note: 'İlk buluşmamız' },
-        { id: 2, note: 'Deniz kenarında yürüyüş' },
-        { id: 3, note: 'Doğum günü sürprizi' },
-        { id: 4, note: 'Yıldızların altında' },
-        { id: 5, note: 'Gelecek hayallerimiz' },
-      ];
-
-      const filteredPhotos = photos.filter((photo) =>
-        photo.note.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-
-      useEffect(() => {
-        const handleSearch = (e) => {
-          setSearchTerm(e.detail);
-        };
-        window.addEventListener('search', handleSearch);
-        return () => window.removeEventListener('search', handleSearch);
-      }, []);
-
-      const observer = useRef(null);
-      const photoRefs = useRef([]);
-
-      useEffect(() => {
-        observer.current = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('visible');
-            }
-          });
-        }, { threshold: 0.1 });
-
-        photoRefs.current.forEach((ref) => {
-          if (ref) observer.current.observe(ref);
-        });
-
-        return () => {
-          if (observer.current) observer.current.disconnect();
-        };
-      }, [filteredPhotos]);
-
-      return (
-        <div className="flex-1 flex justify-center py-8 px-4 sm:px-6 md:ml-48">
-          <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border">
-            <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
-              {filteredPhotos.length === 0 ? (
-                <p className="text-center text-gray-700 text Caring for Your Pet in Winter-xl sm:text-2xl">Arama sonucu bulunamadı</p>
-              ) : (
-                filteredPhotos.map((photo, index) => (
-                  <div
-                    key={photo.id}
-                    ref={(el) => (photoRefs.current[index] = el)}
-                    className="fade-up mx-auto w-10/12 sm:w-8/12 md:w-7/12"
-                  >
-                    <div className="bg-black h-48 sm:h-56 md:h-64 rounded-lg mb-3 sm:mb-4 aspect-square mx-auto"></div>
-                    <p className="text-center text-gray-700 font-medium text-xl sm:text-2xl">{photo.note}</p>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      );
-    }
-
     function GalleryPage({ openModal, startPreview, endPreview }) {
       const photos = Array.from({ length: 40 }, (_, index) => ({
         id: index + 1,
@@ -463,16 +416,16 @@
       return (
         <div className="flex-1 flex justify-center py-8 px-0 md:ml-48">
           <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border">
-            <div className="p-4 sm:p-6 md:p-8 right-gap-grid">
+            <div className="p-6 sm:p-8 md:p-10 grid grid-cols-2 sm:grid-cols-3 gap-6 justify-items-center">
               {photos.map((photo, index) => (
                 <div
                   key={photo.id}
                   ref={(el) => (photoRefs.current[index] = el)}
-                  className="fade-up w-full"
+                  className="fade-up w-full max-w-[160px] cursor-pointer"
                   onClick={() => openModal(photo.id)}
-                  onMouseDown={() => startPreview(photo.id)}
+                  onMouseDown={() => startPreview(photo.id, true)}
                   onMouseUp={endPreview}
-                  onTouchStart={() => startPreview(photo.id)}
+                  onTouchStart={() => startPreview(photo.id, true)}
                   onTouchEnd={endPreview}
                 >
                   <div className="bg-black h-32 sm:h-40 md:h-48 rounded-lg aspect-square"></div>
@@ -483,116 +436,7 @@
         </div>
       );
     }
-    function MemoryGame() {
-  const cardImages = [
-    { src: "foto1.jpg", matched: false },
-    { src: "foto2.jpg", matched: false },
-    { src: "foto3.jpg", matched: false },
-    { src: "foto4.jpg", matched: false },
-    { src: "foto5.jpg", matched: false },
-    { src: "foto6.jpg", matched: false },
-  ];
 
-  const [cards, setCards] = useState([]);
-  const [choiceOne, setChoiceOne] = useState(null);
-  const [choiceTwo, setChoiceTwo] = useState(null);
-  const [disabled, setDisabled] = useState(false);
-  const [completed, setCompleted] = useState(false);
-
-  // oyunu başlat
-  const shuffleCards = () => {
-    const shuffled = [...cardImages, ...cardImages]
-      .sort(() => Math.random() - 0.5)
-      .map((card, index) => ({ ...card, id: index }));
-    setCards(shuffled);
-    setChoiceOne(null);
-    setChoiceTwo(null);
-    setCompleted(false);
-  };
-
-  // ilk açılışta başlat
-  useEffect(() => {
-    shuffleCards();
-  }, []);
-
-  // seçim kontrolü
-  useEffect(() => {
-    if (choiceOne && choiceTwo) {
-      setDisabled(true);
-      if (choiceOne.src === choiceTwo.src) {
-        setCards(prev =>
-          prev.map(card =>
-            card.src === choiceOne.src ? { ...card, matched: true } : card
-          )
-        );
-        resetTurn();
-      } else {
-        setTimeout(() => resetTurn(), 1000);
-      }
-    }
-  }, [choiceOne, choiceTwo]);
-
-  useEffect(() => {
-    if (cards.length && cards.every(card => card.matched)) {
-      setCompleted(true);
-    }
-  }, [cards]);
-
-  const handleChoice = (card) => {
-    if (!disabled) {
-      choiceOne ? setChoiceTwo(card) : setChoiceOne(card);
-    }
-  };
-
-  const resetTurn = () => {
-    setChoiceOne(null);
-    setChoiceTwo(null);
-    setDisabled(false);
-  };
-
-  return (
-    <div className="flex flex-col items-center space-y-6">
-      <h2 className="text-2xl font-bold text-violet-700">Memory Game 💖</h2>
-      {completed && (
-        <div className="text-green-600 font-semibold text-xl">
-          Tebrikler aşkım 💕 tüm anılarımızı buldun!
-        </div>
-      )}
-      <button
-        onClick={shuffleCards}
-        className="bg-violet-600 text-white px-4 py-2 rounded-lg hover:bg-violet-700"
-      >
-        Yeniden Başla
-      </button>
-      <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-        {cards.map(card => (
-          <div
-            key={card.id}
-            className="relative w-24 h-24 sm:w-32 sm:h-32 cursor-pointer"
-            onClick={() => handleChoice(card)}
-          >
-            <img
-              src={card.src}
-              alt="card"
-              className={`absolute inset-0 w-full h-full rounded-lg object-cover transition-transform duration-500 ${
-                card === choiceOne || card === choiceTwo || card.matched
-                  ? "rotate-y-0"
-                  : "rotate-y-180 bg-gray-300"
-              }`}
-            />
-            {!(
-              card === choiceOne ||
-              card === choiceTwo ||
-              card.matched
-            ) && (
-              <div className="absolute inset-0 bg-violet-300 rounded-lg"></div>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
     ReactDOM.render(<App />, document.getElementById('root'));
   </script>
 </body>
