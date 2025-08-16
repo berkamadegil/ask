@@ -513,6 +513,7 @@
     }
 
     function GalleryPage({ openModal, startPreview, endPreview }) {
+      const [searchTerm, setSearchTerm] = useState('');
       const photos = [
         { id: 1, url: 'https://i.ibb.co/20rqPm2r/1755385460802.jpg' },
         { id: 2, url: 'https://i.ibb.co/p6QdsSqW/1755385460701.jpg' },
@@ -538,6 +539,18 @@
         { id: 22, url: 'https://i.ibb.co/C3z99tnh/1755385460141-1.jpg' }
       ];
 
+      const filteredPhotos = photos.filter((photo) =>
+        'holder'.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      useEffect(() => {
+        const handleSearch = (e) => {
+          setSearchTerm(e.detail);
+        };
+        window.addEventListener('search', handleSearch);
+        return () => window.removeEventListener('search', handleSearch);
+      }, []);
+
       const observer = useRef(null);
       const photoRefs = useRef([]);
 
@@ -557,31 +570,35 @@
         return () => {
           if (observer.current) observer.current.disconnect();
         };
-      }, []);
+      }, [filteredPhotos]);
 
       return (
         <div className="flex-1 flex justify-center py-8 px-0 md:ml-48">
           <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border">
             <div className="p-4 sm:p-6 md:p-8 right-gap-grid gap-x-6 sm:gap-x-8 gap-y-8 sm:gap-y-10">
-              {photos.map((photo, index) => (
-                <div
-                  key={photo.id}
-                  ref={(el) => (photoRefs.current[index] = el)}
-                  className="fade-up w-full cursor-pointer"
-                  onClick={() => openModal(photo.url)}
-                  onMouseDown={(e) => startPreview(e, photo.url)}
-                  onMouseUp={endPreview}
-                  onTouchStart={(e) => startPreview(e, photo.url)}
-                  onTouchEnd={endPreview}
-                >
-                  <img
-                    src={photo.url}
-                    alt={`Photo ${photo.id}`}
-                    className="h-32 sm:h-40 md:h-48 rounded-lg aspect-square object-cover shadow-md"
-                    loading="lazy"
-                  />
-                </div>
-              ))}
+              {filteredPhotos.length === 0 ? (
+                <p className="text-center text-gray-700 text-xl sm:text-2xl">Arama sonucu bulunamadı</p>
+              ) : (
+                filteredPhotos.map((photo, index) => (
+                  <div
+                    key={photo.id}
+                    ref={(el) => (photoRefs.current[index] = el)}
+                    className="fade-up w-full cursor-pointer"
+                    onClick={() => openModal(photo.url)}
+                    onMouseDown={(e) => startPreview(e, photo.url)}
+                    onMouseUp={endPreview}
+                    onTouchStart={(e) => startPreview(e, photo.url)}
+                    onTouchEnd={endPreview}
+                  >
+                    <img
+                      src={photo.url}
+                      alt="holder"
+                      className="h-32 sm:h-40 md:h-48 rounded-lg aspect-square object-cover shadow-md"
+                      loading="lazy"
+                    />
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -626,57 +643,49 @@
       return (
         <div className="flex-1 flex justify-center py-8 px-4 sm:px-6 md:ml-48">
           <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border p-4 sm:p-6 md:p-8">
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
-              <div className="flex-1">
-                <h2 className="text-2xl sm:text-3xl text-violet-700 text-center mb-4">Şeyma</h2>
-                {questions.map((question, index) => (
-                  <div key={`seyma-${index}`} className="mb-4">
-                    <textarea
-                      value={seymaNotes[index]}
-                      onChange={(e) => handleNoteChange(index, e.target.value, 'seyma')}
-                      onMouseDown={(e) => startPreview(e, seymaNotes[index] || 'Henüz cevap yazılmadı')}
-                      onMouseUp={endPreview}
-                      onTouchStart={(e) => startPreview(e, seymaNotes[index] || 'Henüz cevap yazılmadı')}
-                      onTouchEnd={endPreview}
-                      className={`w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 transition text-base sm:text-lg resize-none ${
-                        currentUser !== 'seyma' ? 'bg-gray-100 cursor-not-allowed' : ''
-                      }`}
-                      placeholder={currentUser === 'seyma' ? 'Cevabını yaz...' : 'Sadece Şeyma düzenleyebilir'}
-                      disabled={currentUser !== 'seyma'}
-                      rows="3"
-                    />
+            <h2 className="text-2xl sm:text-3xl text-violet-700 text-center mb-6">Notlarımız</h2>
+            <div className="space-y-8">
+              {questions.map((question, index) => (
+                <div key={index} className="space-y-4">
+                  <p className="text-lg sm:text-xl text-gray-700 text-center font-medium">{question}</p>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex-1">
+                      <h3 className="text-base sm:text-lg text-violet-700 text-center mb-2">Şeyma</h3>
+                      <textarea
+                        value={seymaNotes[index]}
+                        onChange={(e) => handleNoteChange(index, e.target.value, 'seyma')}
+                        onMouseDown={(e) => startPreview(e, seymaNotes[index] || 'Henüz cevap yazılmadı')}
+                        onMouseUp={endPreview}
+                        onTouchStart={(e) => startPreview(e, seymaNotes[index] || 'Henüz cevap yazılmadı')}
+                        onTouchEnd={endPreview}
+                        className={`w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 transition text-base sm:text-lg resize-none ${
+                          currentUser !== 'seyma' ? 'bg-gray-100 cursor-not-allowed' : ''
+                        }`}
+                        placeholder={currentUser === 'seyma' ? 'Cevabını yaz...' : 'Sadece Şeyma düzenleyebilir'}
+                        disabled={currentUser !== 'seyma'}
+                        rows="3"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-base sm:text-lg text-violet-700 text-center mb-2">Gökberk</h3>
+                      <textarea
+                        value={gokberkNotes[index]}
+                        onChange={(e) => handleNoteChange(index, e.target.value, 'gokberk')}
+                        onMouseDown={(e) => startPreview(e, gokberkNotes[index] || 'Henüz cevap yazılmadı')}
+                        onMouseUp={endPreview}
+                        onTouchStart={(e) => startPreview(e, gokberkNotes[index] || 'Henüz cevap yazılmadı')}
+                        onTouchEnd={endPreview}
+                        className={`w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 transition text-base sm:text-lg resize-none ${
+                          currentUser !== 'gokberk' ? 'bg-gray-100 cursor-not-allowed' : ''
+                        }`}
+                        placeholder={currentUser === 'gokberk' ? 'Cevabını yaz...' : 'Sadece Gökberk düzenleyebilir'}
+                        disabled={currentUser !== 'gokberk'}
+                        rows="3"
+                      />
+                    </div>
                   </div>
-                ))}
-              </div>
-              <div className="flex-1 text-center">
-                <h2 className="text-2xl sm:text-3xl text-violet-700 mb-4">Sorular</h2>
-                {questions.map((question, index) => (
-                  <p key={index} className="text-lg sm:text-xl text-gray-700 mb-4 leading-relaxed">
-                    {question}
-                  </p>
-                ))}
-              </div>
-              <div className="flex-1">
-                <h2 className="text-2xl sm:text-3xl text-violet-700 text-center mb-4">Gökberk</h2>
-                {questions.map((question, index) => (
-                  <div key={`gokberk-${index}`} className="mb-4">
-                    <textarea
-                      value={gokberkNotes[index]}
-                      onChange={(e) => handleNoteChange(index, e.target.value, 'gokberk')}
-                      onMouseDown={(e) => startPreview(e, gokberkNotes[index] || 'Henüz cevap yazılmadı')}
-                      onMouseUp={endPreview}
-                      onTouchStart={(e) => startPreview(e, gokberkNotes[index] || 'Henüz cevap yazılmadı')}
-                      onTouchEnd={endPreview}
-                      className={`w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 transition text-base sm:text-lg resize-none ${
-                        currentUser !== 'gokberk' ? 'bg-gray-100 cursor-not-allowed' : ''
-                      }`}
-                      placeholder={currentUser === 'gokberk' ? 'Cevabını yaz...' : 'Sadece Gökberk düzenleyebilir'}
-                      disabled={currentUser !== 'gokberk'}
-                      rows="3"
-                    />
-                  </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
