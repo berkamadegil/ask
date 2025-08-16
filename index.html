@@ -442,10 +442,14 @@ function GalleryPage() {
   const [previewPhoto, setPreviewPhoto] = React.useState(null);
   const [pressTimer, setPressTimer] = React.useState(null);
 
-  const startPreviewTimer = (photo) => {
+  // basma başladığında
+  const startPreviewTimer = (e, photo) => {
+    // kaydırma ile tetiklememek için yalnızca fare veya parmak basarsa
+    e.stopPropagation();
+    e.preventDefault();
     const timer = setTimeout(() => {
       setPreviewPhoto(photo);
-    }, 300); // 1.5 saniye basınca preview
+    }, 500);
     setPressTimer(timer);
   };
 
@@ -456,16 +460,16 @@ function GalleryPage() {
   const closePreview = () => setPreviewPhoto(null);
 
   return (
-    <div className="flex-1 flex justify-center py-8 px-0 md:ml-48">
+    <div className="flex-1 flex justify-center py-8 px-0 md:ml-48 overflow-hidden">
       <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border">
         <div className="p-4 sm:p-6 md:p-8 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-6 justify-items-center">
           {photos.map((photo) => (
             <div
               key={photo.id}
-              className="w-full sm:w-32 md:w-36 cursor-pointer relative"
-              onMouseDown={() => startPreviewTimer(photo)}
+              className="w-full sm:w-32 md:w-36 cursor-pointer relative touch-none"
+              onMouseDown={(e) => startPreviewTimer(e, photo)}
               onMouseUp={cancelPreviewTimer}
-              onTouchStart={() => startPreviewTimer(photo)}
+              onTouchStart={(e) => startPreviewTimer(e, photo)}
               onTouchEnd={cancelPreviewTimer}
             >
               <div className="bg-black h-32 sm:h-36 md:h-40 rounded-lg aspect-square"></div>
@@ -500,8 +504,15 @@ style.innerHTML = `
 .animate-scaleIn {
   animation: scaleIn 0.3s ease forwards;
 }
+
+/* Sayfanın yatay kaydırmasını tamamen kapat */
+body {
+  overflow-x: hidden !important;
+  touch-action: pan-y;
+}
 `;
 document.head.appendChild(style);
+
 
     function MemoryGame() {
   const cardImages = [
@@ -617,5 +628,6 @@ document.head.appendChild(style);
   </script>
 </body>
 </html>
+
 
 
