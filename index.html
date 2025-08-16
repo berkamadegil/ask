@@ -129,6 +129,22 @@
     .preview-container.hidden {
       animation: scaleOut 0.5s ease-in-out forwards;
     }
+    .heart-animation {
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    .note-preview {
+      animation: glow 1s ease-in-out forwards;
+    }
+    @keyframes glow {
+      0% { box-shadow: 0 0 0 rgba(244, 114, 182, 0); }
+      50% { box-shadow: 0 0 20px rgba(244, 114, 182, 0.5); }
+      100% { box-shadow: 0 0 0 rgba(244, 114, 182, 0); }
+    }
   </style>
 </head>
 <body>
@@ -141,11 +157,17 @@
       const [password, setPassword] = useState('');
       const [isLoggedIn, setIsLoggedIn] = useState(false);
       const [error, setError] = useState('');
+      const [currentUser, setCurrentUser] = useState(null);
 
       const handleLogin = (e) => {
         e.preventDefault();
-        if (username === 'admin' && password === 'admin') {
+        if (username === 'seyma' && password === 'seyma123') {
           setIsLoggedIn(true);
+          setCurrentUser('seyma');
+          setError('');
+        } else if (username === 'gokberk' && password === 'gokberk123') {
+          setIsLoggedIn(true);
+          setCurrentUser('gokberk');
           setError('');
         } else {
           setError('Kullanıcı adı veya şifre yanlış!');
@@ -153,7 +175,7 @@
       };
 
       if (isLoggedIn) {
-        return <MainLayout />;
+        return <MainLayout currentUser={currentUser} />;
       }
 
       return (
@@ -194,7 +216,7 @@
       );
     }
 
-    function MainLayout() {
+    function MainLayout({ currentUser }) {
       const [isSidebarOpen, setIsSidebarOpen] = useState(false);
       const [activeTab, setActiveTab] = useState('İlklerimiz');
       const [selectedPhoto, setSelectedPhoto] = useState(null);
@@ -214,14 +236,14 @@
 
       const closeModal = () => {
         setModalVisible(false);
-        setTimeout(() => setSelectedPhoto(null), 500); // Wait for fade out
+        setTimeout(() => setSelectedPhoto(null), 500);
       };
 
-      const startPreview = (e, photoUrl) => {
+      const startPreview = (e, content) => {
         e.stopPropagation();
         e.preventDefault();
         const timer = setTimeout(() => {
-          setPreviewPhoto(photoUrl);
+          setPreviewPhoto(content);
           setPreviewVisible(true);
         }, 1500);
         setPressTimer(timer);
@@ -230,7 +252,7 @@
       const endPreview = () => {
         if (pressTimer) clearTimeout(pressTimer);
         setPreviewVisible(false);
-        setTimeout(() => setPreviewPhoto(null), 500); // Wait for fade out
+        setTimeout(() => setPreviewPhoto(null), 500);
       };
 
       const scrollDown = () => {
@@ -266,20 +288,27 @@
           />
           {activeTab === 'İlklerimiz' && <FirstsPage />}
           {activeTab === 'Galerimiz' && <GalleryPage openModal={openModal} startPreview={startPreview} endPreview={endPreview} />}
-          {activeTab === 'Oyunlar' && (
-            <div className="flex-1 flex justify-center py-8 px-4 sm:px-6 md:ml-48">
-              <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border p-4 sm:p-6 md:p-8">
-                <MemoryGame />
-              </div>
-            </div>
-          )}
+          {activeTab === 'Notlarımız' && <NotesPage currentUser={currentUser} startPreview={startPreview} endPreview={endPreview} />}
           {activeTab === 'Sana Olan Mesajım' && (
             <div className="flex-1 flex justify-center py-8 px-4 sm:px-6 md:ml-48">
-              <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border p-4 sm:p-6 md:p-8">
-                <h2 className="text-2xl sm:text-3xl text-violet-700 text-center">Sana söylemek istediğim tek şey teşşekür ederim. Beni tekrar iyi duygulara soktuğun için.
-                   Kimsenin olmadığı gibi destek olduğun için. Yanımda olduğun için. Beni sevdiğin ve saydığın için. Gelecek neleri getirir bilmiyorum ama seninle geçirdiğim her saniyemden mutluyum
-                   İyi ki hayatımdasın. Bunlar gaza geldiğim için yazdığım şeyler değil. Bunları 2 haftalık sevgilin yazmıyor. 2 yıllık arkadaşın olarak yazıyorum.
-                   Seninle her şeye varım, yeter ki heyecanını kaybetme. Seni seviyorum tavşanım</h2>
+              <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border p-4 sm:p-6 md:p-8 text-center">
+                <h2 className="text-2xl sm:text-3xl text-violet-700 mb-4">Sana Olan Mesajım</h2>
+                <p className="text-lg sm:text-xl text-gray-700 mb-4 leading-relaxed">
+                  Sana söylemek istediğim tek şey teşekkür ederim. Beni tekrar iyi duygulara soktuğun için.
+                </p>
+                <p className="text-lg sm:text-xl text-gray-700 mb-4 leading-relaxed">
+                  Kimsenin olmadığı gibi destek olduğun için. Yanımda olduğun için. Beni sevdiğin ve saydığın için.
+                </p>
+                <p className="text-lg sm:text-xl text-gray-700 mb-4 leading-relaxed">
+                  Gelecek neleri getirir bilmiyorum ama seninle geçirdiğim her saniyemden mutluyum. İyi ki hayatımdasın.
+                </p>
+                <p className="text-lg sm:text-xl text-gray-700 mb-4 leading-relaxed">
+                  Bunlar gaza geldiğim için yazdığım şeyler değil. Bunları 2 haftalık sevgilin yazmıyor. 2 yıllık arkadaşın olarak yazıyorum.
+                </p>
+                <p className="text-lg sm:text-xl text-gray-700 mb-4 leading-relaxed">
+                  Seninle her şeye varım, yeter ki heyecanını kaybetme. Seni seviyorum tavşanım
+                  <span className="inline-block text-2xl heart-animation">💖</span>
+                </p>
               </div>
             </div>
           )}
@@ -296,6 +325,7 @@
                   src={selectedPhoto}
                   alt="Full screen"
                   className="h-[80vh] w-full rounded-lg mx-auto object-cover"
+                  loading="lazy"
                 />
               </div>
             </div>
@@ -303,11 +333,18 @@
           {previewPhoto && (
             <div className={`modal ${previewVisible ? 'visible' : 'hidden'}`} onMouseUp={endPreview} onTouchEnd={endPreview}>
               <div className={`preview-container w-full max-w-[90%] sm:max-w-[80%] md:max-w-[70%] ${previewVisible ? '' : 'hidden'}`}>
-                <img
-                  src={previewPhoto}
-                  alt="Preview"
-                  className="h-[80vh] w-full rounded-lg mx-auto object-cover"
-                />
+                {typeof previewPhoto === 'string' && previewPhoto.startsWith('https://') ? (
+                  <img
+                    src={previewPhoto}
+                    alt="Preview"
+                    className="h-[80vh] w-full rounded-lg mx-auto object-cover"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="h-[80vh] w-full rounded-lg mx-auto bg-white p-4 flex items-center justify-center note-preview">
+                    <p className="text-lg text-gray-700">{previewPhoto}</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -372,7 +409,7 @@
               </div>
             </div>
             <nav className="flex-1 space-y-3 sm:space-y-4">
-              {['Galerimiz', 'İlklerimiz', 'Oyunlar', 'Sana Olan Mesajım'].map((tab) => (
+              {['Galerimiz', 'İlklerimiz', 'Notlarımız', 'Sana Olan Mesajım'].map((tab) => (
                 <a
                   key={tab}
                   href="#"
@@ -462,7 +499,8 @@
                     <img
                       src={photo.url}
                       alt={photo.note}
-                      className="h-48 sm:h-56 md:h-64 rounded-lg mb-3 sm:mb-4 aspect-square mx-auto object-cover"
+                      className="h-48 sm:h-56 md:h-64 rounded-lg mb-3 sm:mb-4 aspect-square mx-auto object-cover shadow-md"
+                      loading="lazy"
                     />
                     <p className="text-center text-gray-700 font-medium text-xl sm:text-2xl">{photo.note}</p>
                   </div>
@@ -476,30 +514,28 @@
 
     function GalleryPage({ openModal, startPreview, endPreview }) {
       const photos = [
-
-       { id: 1, url: 'https://i.ibb.co/20rqPm2r/1755385460802.jpg' },
-  { id: 2, url: 'https://i.ibb.co/p6QdsSqW/1755385460701.jpg' },
-  { id: 3, url: 'https://i.ibb.co/QvHTPfCx/1755385460671.jpg' },
-  { id: 4, url: 'https://i.ibb.co/R4950Nvw/1755385460644.jpg' },
-  { id: 5, url: 'https://i.ibb.co/KjbKpnHg/1755385460618.jpg' },
-  { id: 6, url: 'https://i.ibb.co/sJ6rFm02/1755385460598.jpg' },
-  { id: 7, url: 'https://i.ibb.co/C563y0FN/1755385460569.jpg' },
-  { id: 8, url: 'https://i.ibb.co/vx83QSYq/1755385460544.jpg' },
-  { id: 9, url: 'https://i.ibb.co/LDwKr6Yh/1755385460515.jpg' },
-  { id: 10, url: 'https://i.ibb.co/Pvj0fxFz/1755385460489.jpg' },
-  { id: 11, url: 'https://i.ibb.co/rGBX2FWt/1755385460463.jpg' },
-  { id: 12, url: 'https://i.ibb.co/KpXd07pm/1755385460411.jpg' },
-  { id: 13, url: 'https://i.ibb.co/rf5zJH64/1755385460377.jpg' },
-  { id: 14, url: 'https://i.ibb.co/d4XG6cQv/1755385460348.jpg' },
-  { id: 15, url: 'https://i.ibb.co/jP4hqLZ8/1755385460311.jpg' },
-  { id: 16, url: 'https://i.ibb.co/nNdgfQzM/1755385460276.jpg' },
-  { id: 17, url: 'https://i.ibb.co/JRJyGz4K/1755385460246.jpg' },
-  { id: 18, url: 'https://i.ibb.co/VY0KbTrP/1755385460224.jpg' },
-  { id: 19, url: 'https://i.ibb.co/KccNybcz/1755385460205.jpg' },
-  { id: 20, url: 'https://i.ibb.co/gM5wP88B/1755385460187.jpg' },
-  { id: 21, url: 'https://i.ibb.co/ns4t330R/1755385460163.jpg' },
-  { id: 22, url: 'https://i.ibb.co/C3z99tnh/1755385460141-1.jpg' }
-        // Add more up to 40 photos with your ImgBB URLs
+        { id: 1, url: 'https://i.ibb.co/20rqPm2r/1755385460802.jpg' },
+        { id: 2, url: 'https://i.ibb.co/p6QdsSqW/1755385460701.jpg' },
+        { id: 3, url: 'https://i.ibb.co/QvHTPfCx/1755385460671.jpg' },
+        { id: 4, url: 'https://i.ibb.co/R4950Nvw/1755385460644.jpg' },
+        { id: 5, url: 'https://i.ibb.co/KjbKpnHg/1755385460618.jpg' },
+        { id: 6, url: 'https://i.ibb.co/sJ6rFm02/1755385460598.jpg' },
+        { id: 7, url: 'https://i.ibb.co/C563y0FN/1755385460569.jpg' },
+        { id: 8, url: 'https://i.ibb.co/vx83QSYq/1755385460544.jpg' },
+        { id: 9, url: 'https://i.ibb.co/LDwKr6Yh/1755385460515.jpg' },
+        { id: 10, url: 'https://i.ibb.co/Pvj0fxFz/1755385460489.jpg' },
+        { id: 11, url: 'https://i.ibb.co/rGBX2FWt/1755385460463.jpg' },
+        { id: 12, url: 'https://i.ibb.co/KpXd07pm/1755385460411.jpg' },
+        { id: 13, url: 'https://i.ibb.co/rf5zJH64/1755385460377.jpg' },
+        { id: 14, url: 'https://i.ibb.co/d4XG6cQv/1755385460348.jpg' },
+        { id: 15, url: 'https://i.ibb.co/jP4hqLZ8/1755385460311.jpg' },
+        { id: 16, url: 'https://i.ibb.co/nNdgfQzM/1755385460276.jpg' },
+        { id: 17, url: 'https://i.ibb.co/JRJyGz4K/1755385460246.jpg' },
+        { id: 18, url: 'https://i.ibb.co/VY0KbTrP/1755385460224.jpg' },
+        { id: 19, url: 'https://i.ibb.co/KccNybcz/1755385460205.jpg' },
+        { id: 20, url: 'https://i.ibb.co/gM5wP88B/1755385460187.jpg' },
+        { id: 21, url: 'https://i.ibb.co/ns4t330R/1755385460163.jpg' },
+        { id: 22, url: 'https://i.ibb.co/C3z99tnh/1755385460141-1.jpg' }
       ];
 
       const observer = useRef(null);
@@ -541,7 +577,8 @@
                   <img
                     src={photo.url}
                     alt={`Photo ${photo.id}`}
-                    className="h-32 sm:h-40 md:h-48 rounded-lg aspect-square object-cover"
+                    className="h-32 sm:h-40 md:h-48 rounded-lg aspect-square object-cover shadow-md"
+                    loading="lazy"
                   />
                 </div>
               ))}
@@ -551,109 +588,96 @@
       );
     }
 
-    function MemoryGame() {
-      const cardImages = [
-        { src: 'https://i.ibb.co/C3z99tnh/1755385460141-1.jpg', matched: false },
-        { src: 'https://i.ibb.co/KpXd07pm/1755385460411.jpg', matched: false },
-        { src: 'https://i.ibb.co/rf5zJH64/1755385460377.jpg', matched: false },
-        { src: 'https://i.ibb.co/VY0KbTrP/1755385460224.jpg', matched: false },
-        { src: 'https://i.ibb.co/KccNybcz/1755385460205.jpg', matched: false },
-        { src: 'https://i.ibb.co/vx83QSYq/1755385460544.jpg', matched: false },
+    function NotesPage({ currentUser, startPreview, endPreview }) {
+      const questions = [
+        'Kaç çocuk istiyorsun?',
+        'En sevdiğin renk ne?',
+        'En sevdiğin yemek?',
+        'Hayalindeki tatil yeri?'
       ];
 
-      const [cards, setCards] = useState([]);
-      const [choiceOne, setChoiceOne] = useState(null);
-      const [choiceTwo, setChoiceTwo] = useState(null);
-      const [disabled, setDisabled] = useState(false);
-      const [completed, setCompleted] = useState(false);
-
-      const shuffleCards = () => {
-        const shuffled = [...cardImages, ...cardImages]
-          .sort(() => Math.random() - 0.5)
-          .map((card, index) => ({ ...card, id: index }));
-        setCards(shuffled);
-        setChoiceOne(null);
-        setChoiceTwo(null);
-        setCompleted(false);
-      };
+      const [seymaNotes, setSeymaNotes] = useState(
+        JSON.parse(localStorage.getItem('seymaNotes')) || Array(questions.length).fill('')
+      );
+      const [gokberkNotes, setGokberkNotes] = useState(
+        JSON.parse(localStorage.getItem('gokberkNotes')) || Array(questions.length).fill('')
+      );
 
       useEffect(() => {
-        shuffleCards();
-      }, []);
-
-      useEffect(() => {
-        if (choiceOne && choiceTwo) {
-          setDisabled(true);
-          if (choiceOne.src === choiceTwo.src) {
-            setCards(prev =>
-              prev.map(card =>
-                card.src === choiceOne.src ? { ...card, matched: true } : card
-              )
-            );
-            resetTurn();
-          } else {
-            setTimeout(() => resetTurn(), 1000);
-          }
+        if (currentUser === 'seyma') {
+          localStorage.setItem('seymaNotes', JSON.stringify(seymaNotes));
+        } else if (currentUser === 'gokberk') {
+          localStorage.setItem('gokberkNotes', JSON.stringify(gokberkNotes));
         }
-      }, [choiceOne, choiceTwo]);
+      }, [seymaNotes, gokberkNotes, currentUser]);
 
-      useEffect(() => {
-        if (cards.length && cards.every(card => card.matched)) {
-          setCompleted(true);
+      const handleNoteChange = (index, value, user) => {
+        if (user === 'seyma' && currentUser === 'seyma') {
+          const newNotes = [...seymaNotes];
+          newNotes[index] = value;
+          setSeymaNotes(newNotes);
+        } else if (user === 'gokberk' && currentUser === 'gokberk') {
+          const newNotes = [...gokberkNotes];
+          newNotes[index] = value;
+          setGokberkNotes(newNotes);
         }
-      }, [cards]);
-
-      const handleChoice = (card) => {
-        if (!disabled) {
-          choiceOne ? setChoiceTwo(card) : setChoiceOne(card);
-        }
-      };
-
-      const resetTurn = () => {
-        setChoiceOne(null);
-        setChoiceTwo(null);
-        setDisabled(false);
       };
 
       return (
-        <div className="flex flex-col items-center space-y-6">
-          <h2 className="text-2xl font-bold text-violet-700">Memory Game 💖</h2>
-          {completed && (
-            <div className="text-green-600 font-semibold text-xl">
-              Tebrikler aşkım 💕 tüm anılarımızı buldun!
-            </div>
-          )}
-          <button
-            onClick={shuffleCards}
-            className="bg-violet-600 text-white px-4 py-2 rounded-lg hover:bg-violet-700"
-          >
-            Yeniden Başla
-          </button>
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-            {cards.map(card => (
-              <div
-                key={card.id}
-                className="relative w-24 h-24 sm:w-32 sm:h-32 cursor-pointer"
-                onClick={() => handleChoice(card)}
-              >
-                <img
-                  src={card.src}
-                  alt="card"
-                  className={`absolute inset-0 w-full h-full rounded-lg object-cover transition-transform duration-500 ${
-                    card === choiceOne || card === choiceTwo || card.matched
-                      ? "rotate-y-0"
-                      : "rotate-y-180 bg-gray-300"
-                  }`}
-                />
-                {!(
-                  card === choiceOne ||
-                  card === choiceTwo ||
-                  card.matched
-                ) && (
-                  <div className="absolute inset-0 bg-violet-300 rounded-lg"></div>
-                )}
+        <div className="flex-1 flex justify-center py-8 px-4 sm:px-6 md:ml-48">
+          <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border p-4 sm:p-6 md:p-8">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
+              <div className="flex-1">
+                <h2 className="text-2xl sm:text-3xl text-violet-700 text-center mb-4">Şeyma</h2>
+                {questions.map((question, index) => (
+                  <div key={`seyma-${index}`} className="mb-4">
+                    <textarea
+                      value={seymaNotes[index]}
+                      onChange={(e) => handleNoteChange(index, e.target.value, 'seyma')}
+                      onMouseDown={(e) => startPreview(e, seymaNotes[index] || 'Henüz cevap yazılmadı')}
+                      onMouseUp={endPreview}
+                      onTouchStart={(e) => startPreview(e, seymaNotes[index] || 'Henüz cevap yazılmadı')}
+                      onTouchEnd={endPreview}
+                      className={`w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 transition text-base sm:text-lg resize-none ${
+                        currentUser !== 'seyma' ? 'bg-gray-100 cursor-not-allowed' : ''
+                      }`}
+                      placeholder={currentUser === 'seyma' ? 'Cevabını yaz...' : 'Sadece Şeyma düzenleyebilir'}
+                      disabled={currentUser !== 'seyma'}
+                      rows="3"
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
+              <div className="flex-1 text-center">
+                <h2 className="text-2xl sm:text-3xl text-violet-700 mb-4">Sorular</h2>
+                {questions.map((question, index) => (
+                  <p key={index} className="text-lg sm:text-xl text-gray-700 mb-4 leading-relaxed">
+                    {question}
+                  </p>
+                ))}
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl sm:text-3xl text-violet-700 text-center mb-4">Gökberk</h2>
+                {questions.map((question, index) => (
+                  <div key={`gokberk-${index}`} className="mb-4">
+                    <textarea
+                      value={gokberkNotes[index]}
+                      onChange={(e) => handleNoteChange(index, e.target.value, 'gokberk')}
+                      onMouseDown={(e) => startPreview(e, gokberkNotes[index] || 'Henüz cevap yazılmadı')}
+                      onMouseUp={endPreview}
+                      onTouchStart={(e) => startPreview(e, gokberkNotes[index] || 'Henüz cevap yazılmadı')}
+                      onTouchEnd={endPreview}
+                      className={`w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 transition text-base sm:text-lg resize-none ${
+                        currentUser !== 'gokberk' ? 'bg-gray-100 cursor-not-allowed' : ''
+                      }`}
+                      placeholder={currentUser === 'gokberk' ? 'Cevabını yaz...' : 'Sadece Gökberk düzenleyebilir'}
+                      disabled={currentUser !== 'gokberk'}
+                      rows="3"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       );
