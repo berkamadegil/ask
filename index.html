@@ -9,6 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.24.7/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Raleway:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://db.onlinewebfonts.com/c/0b4e4407c43b4d8c925e2700d1b3bc8a?family=Fiolex+Girls" rel="stylesheet" type="text/css"/>
   <style>
     @keyframes gradientAnimation {
       0% { background-position: 0% 50%; }
@@ -137,13 +138,12 @@
       50% { transform: scale(1.2); }
       100% { transform: scale(1); }
     }
-    .note-preview {
-      animation: glow 1s ease-in-out forwards;
-    }
-    @keyframes glow {
-      0% { box-shadow: 0 0 0 rgba(244, 114, 182, 0); }
-      50% { box-shadow: 0 0 20px rgba(244, 114, 182, 0.5); }
-      100% { box-shadow: 0 0 0 rgba(244, 114, 182, 0); }
+    .caption {
+      font-family: 'Fiolex Girls', cursive;
+      color: #f472b6;
+      font-size: 1rem;
+      text-align: center;
+      margin-top: 0.25rem;
     }
   </style>
 </head>
@@ -161,11 +161,11 @@
 
       const handleLogin = (e) => {
         e.preventDefault();
-        if (username === 'seyma' && password === 'seyma123') {
+        if (username === 'seyma' && password === 'seyma599') {
           setIsLoggedIn(true);
           setCurrentUser('seyma');
           setError('');
-        } else if (username === 'gokberk' && password === 'gokberk123') {
+        } else if (username === 'gokberk' && password === 'gokberk553') {
           setIsLoggedIn(true);
           setCurrentUser('gokberk');
           setError('');
@@ -288,7 +288,7 @@
           />
           {activeTab === 'En İyi Anlarımız' && <FirstsPage />}
           {activeTab === 'Galerimiz' && <GalleryPage openModal={openModal} startPreview={startPreview} endPreview={endPreview} />}
-          {activeTab === 'Notlarımız' && <NotesPage currentUser={currentUser} startPreview={startPreview} endPreview={endPreview} />}
+          {activeTab === 'Notlarımız' && <NotesPage currentUser={currentUser} />}
           {activeTab === 'Sana Olan Mesajım' && (
             <div className="flex-1 flex justify-center py-8 px-4 sm:px-6 md:ml-48">
               <div className="w-full sm:w-11/12 md:w-3/5 bg-white rounded-lg shadow-xl animated-border p-4 sm:p-6 md:p-8 text-center">
@@ -333,18 +333,12 @@
           {previewPhoto && (
             <div className={`modal ${previewVisible ? 'visible' : 'hidden'}`} onMouseUp={endPreview} onTouchEnd={endPreview}>
               <div className={`preview-container w-full max-w-[90%] sm:max-w-[80%] md:max-w-[70%] ${previewVisible ? '' : 'hidden'}`}>
-                {typeof previewPhoto === 'string' && previewPhoto.startsWith('https://') ? (
-                  <img
-                    src={previewPhoto}
-                    alt="Preview"
-                    className="h-[80vh] w-full rounded-lg mx-auto object-cover"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="h-[80vh] w-full rounded-lg mx-auto bg-white p-4 flex items-center justify-center note-preview">
-                    <p className="text-lg text-gray-700">{previewPhoto}</p>
-                  </div>
-                )}
+                <img
+                  src={previewPhoto}
+                  alt="Preview"
+                  className="h-[80vh] w-full rounded-lg mx-auto object-cover"
+                  loading="lazy"
+                />
               </div>
             </div>
           )}
@@ -515,28 +509,28 @@
     function GalleryPage({ openModal, startPreview, endPreview }) {
       const [searchTerm, setSearchTerm] = useState('');
       const photos = [
-        { id: 1, url: 'https://i.ibb.co/20rqPm2r/1755385460802.jpg', caption: 'holder' },
-        { id: 2, url: 'https://i.ibb.co/p6QdsSqW/1755385460701.jpg', caption: 'holder' },
-        { id: 3, url: 'https://i.ibb.co/QvHTPfCx/1755385460671.jpg', caption: 'holder' },
-        { id: 4, url: 'https://i.ibb.co/R4950Nvw/1755385460644.jpg', caption: 'holder' },
-        { id: 5, url: 'https://i.ibb.co/KjbKpnHg/1755385460618.jpg', caption: 'holder' },
-        { id: 6, url: 'https://i.ibb.co/sJ6rFm02/1755385460598.jpg', caption: 'holder' },
-        { id: 7, url: 'https://i.ibb.co/C563y0FN/1755385460569.jpg', caption: 'holder' },
-        { id: 8, url: 'https://i.ibb.co/vx83QSYq/1755385460544.jpg', caption: 'holder' },
-        { id: 9, url: 'https://i.ibb.co/LDwKr6Yh/1755385460515.jpg', caption: 'holder' },
-        { id: 10, url: 'https://i.ibb.co/Pvj0fxFz/1755385460489.jpg', caption: 'holder' },
-        { id: 11, url: 'https://i.ibb.co/rGBX2FWt/1755385460463.jpg', caption: 'holder' },
-        { id: 12, url: 'https://i.ibb.co/KpXd07pm/1755385460411.jpg', caption: 'holder' },
-        { id: 13, url: 'https://i.ibb.co/rf5zJH64/1755385460377.jpg', caption: 'holder' },
-        { id: 14, url: 'https://i.ibb.co/d4XG6cQv/1755385460348.jpg', caption: 'holder' },
-        { id: 15, url: 'https://i.ibb.co/jP4hqLZ8/1755385460311.jpg', caption: 'holder' },
-        { id: 16, url: 'https://i.ibb.co/nNdgfQzM/1755385460276.jpg', caption: 'holder' },
-        { id: 17, url: 'https://i.ibb.co/JRJyGz4K/1755385460246.jpg', caption: 'holder' },
-        { id: 18, url: 'https://i.ibb.co/VY0KbTrP/1755385460224.jpg', caption: 'holder' },
-        { id: 19, url: 'https://i.ibb.co/KccNybcz/1755385460205.jpg', caption: 'holder' },
-        { id: 20, url: 'https://i.ibb.co/gM5wP88B/1755385460187.jpg', caption: 'holder' },
-        { id: 21, url: 'https://i.ibb.co/ns4t330R/1755385460163.jpg', caption: 'holder' },
-        { id: 22, url: 'https://i.ibb.co/C3z99tnh/1755385460141-1.jpg', caption: 'holder' }
+        { id: 1, url: 'https://i.ibb.co/20rqPm2r/1755385460802.jpg', caption: '1000' },
+        { id: 2, url: 'https://i.ibb.co/p6QdsSqW/1755385460701.jpg', caption: 'Kere' },
+        { id: 3, url: 'https://i.ibb.co/QvHTPfCx/1755385460671.jpg', caption: 'Gelsem' },
+        { id: 4, url: 'https://i.ibb.co/R4950Nvw/1755385460644.jpg', caption: 'Dünyaya' },
+        { id: 5, url: 'https://i.ibb.co/KjbKpnHg/1755385460618.jpg', caption: '1000' },
+        { id: 6, url: 'https://i.ibb.co/sJ6rFm02/1755385460598.jpg', caption: 'Kere' },
+        { id: 7, url: 'https://i.ibb.co/C563y0FN/1755385460569.jpg', caption: 'Seveceğim' },
+        { id: 8, url: 'https://i.ibb.co/vx83QSYq/1755385460544.jpg', caption: 'Hükmüm' },
+        { id: 9, url: 'https://i.ibb.co/LDwKr6Yh/1755385460515.jpg', caption: 'İdam' },
+        { id: 10, url: 'https://i.ibb.co/Pvj0fxFz/1755385460489.jpg', caption: 'Olsa' },
+        { id: 11, url: 'https://i.ibb.co/rGBX2FWt/1755385460463.jpg', caption: 'Bile' },
+        { id: 12, url: 'https://i.ibb.co/KpXd07pm/1755385460411.jpg', caption: 'Severek' },
+        { id: 13, url: 'https://i.ibb.co/rf5zJH64/1755385460377.jpg', caption: 'Öleceğim' },
+        { id: 14, url: 'https://i.ibb.co/d4XG6cQv/1755385460348.jpg', caption: 'Selam' },
+        { id: 15, url: 'https://i.ibb.co/jP4hqLZ8/1755385460311.jpg', caption: 'Kalbimi' },
+        { id: 16, url: 'https://i.ibb.co/nNdgfQzM/1755385460276.jpg', caption: 'Sende' },
+        { id: 17, url: 'https://i.ibb.co/JRJyGz4K/1755385460246.jpg', caption: 'Unutmuşum' },
+        { id: 18, url: 'https://i.ibb.co/VY0KbTrP/1755385460224.jpg', caption: 'İstersen' },
+        { id: 19, url: 'https://i.ibb.co/KccNybcz/1755385460205.jpg', caption: 'Sen de' },
+        { id: 20, url: 'https://i.ibb.co/gM5wP88B/1755385460187.jpg', caption: 'Benimkini' },
+        { id: 21, url: 'https://i.ibb.co/ns4t330R/1755385460163.jpg', caption: 'Al' },
+        { id: 22, url: 'https://i.ibb.co/C3z99tnh/1755385460141-1.jpg', caption: 'Ödeşelim' }
       ];
 
       const filteredPhotos = photos.filter((photo) =>
@@ -593,10 +587,10 @@
                     <img
                       src={photo.url}
                       alt={photo.caption}
-                      className="h-32 sm:h-40 md:h-48 rounded-lg aspect-square object-cover shadow-md"
+                      className="h-32 sm:h-40 md:h-48 rounded-lg aspect-square object-cover shadow-md mx-auto"
                       loading="lazy"
                     />
-                    <p className="text-center text-gray-700 font-medium text-base sm:text-lg mt-2">{photo.caption}</p>
+                    <p className="caption">{photo.caption}</p>
                   </div>
                 ))
               )}
@@ -606,7 +600,7 @@
       );
     }
 
-    function NotesPage({ currentUser, startPreview, endPreview }) {
+    function NotesPage({ currentUser }) {
       const questions = [
         'Önce erkek çocuğu mu kız çocuğu mu?',
         'Kaç erkek kaç kız?',
@@ -657,10 +651,6 @@
                       <textarea
                         value={seymaNotes[index]}
                         onChange={(e) => handleNoteChange(index, e.target.value, 'seyma')}
-                        onMouseDown={(e) => startPreview(e, seymaNotes[index] || 'Henüz cevap yazılmadı')}
-                        onMouseUp={endPreview}
-                        onTouchStart={(e) => startPreview(e, seymaNotes[index] || 'Henüz cevap yazılmadı')}
-                        onTouchEnd={endPreview}
                         className={`w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 transition text-base sm:text-lg resize-none ${
                           currentUser !== 'seyma' ? 'bg-gray-100 cursor-not-allowed' : ''
                         }`}
@@ -674,10 +664,6 @@
                       <textarea
                         value={gokberkNotes[index]}
                         onChange={(e) => handleNoteChange(index, e.target.value, 'gokberk')}
-                        onMouseDown={(e) => startPreview(e, gokberkNotes[index] || 'Henüz cevap yazılmadı')}
-                        onMouseUp={endPreview}
-                        onTouchStart={(e) => startPreview(e, gokberkNotes[index] || 'Henüz cevap yazılmadı')}
-                        onTouchEnd={endPreview}
                         className={`w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 transition text-base sm:text-lg resize-none ${
                           currentUser !== 'gokberk' ? 'bg-gray-100 cursor-not-allowed' : ''
                         }`}
