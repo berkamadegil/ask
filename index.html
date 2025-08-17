@@ -218,7 +218,7 @@
 
     function MainLayout({ currentUser }) {
       const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-      const [activeTab, setActiveTab] = useState('İlklerimiz');
+      const [activeTab, setActiveTab] = useState('En İyi Anlarımız');
       const [selectedPhoto, setSelectedPhoto] = useState(null);
       const [previewPhoto, setPreviewPhoto] = useState(null);
       const [modalVisible, setModalVisible] = useState(false);
@@ -286,7 +286,7 @@
             activeTab={activeTab}
             setActiveTab={setActiveTab}
           />
-          {activeTab === 'İlklerimiz' && <FirstsPage />}
+          {activeTab === 'En İyi Anlarımız' && <FirstsPage />}
           {activeTab === 'Galerimiz' && <GalleryPage openModal={openModal} startPreview={startPreview} endPreview={endPreview} />}
           {activeTab === 'Notlarımız' && <NotesPage currentUser={currentUser} startPreview={startPreview} endPreview={endPreview} />}
           {activeTab === 'Sana Olan Mesajım' && (
@@ -348,7 +348,7 @@
               </div>
             </div>
           )}
-          {(activeTab === 'İlklerimiz' || activeTab === 'Galerimiz') && (
+          {(activeTab === 'En İyi Anlarımız' || activeTab === 'Galerimiz') && (
             <div className="fixed right-4 top-1/2 transform -translate-y-1/2 z-50 flex flex-col items-center">
               <div className="w-1 h-8 bg-violet-600 mb-2"></div>
               <button
@@ -409,7 +409,7 @@
               </div>
             </div>
             <nav className="flex-1 space-y-3 sm:space-y-4">
-              {['Galerimiz', 'İlklerimiz', 'Notlarımız', 'Sana Olan Mesajım'].map((tab) => (
+              {['Galerimiz', 'En İyi Anlarımız', 'Notlarımız', 'Sana Olan Mesajım'].map((tab) => (
                 <a
                   key={tab}
                   href="#"
@@ -515,32 +515,32 @@
     function GalleryPage({ openModal, startPreview, endPreview }) {
       const [searchTerm, setSearchTerm] = useState('');
       const photos = [
-        { id: 1, url: 'https://i.ibb.co/20rqPm2r/1755385460802.jpg' },
-        { id: 2, url: 'https://i.ibb.co/p6QdsSqW/1755385460701.jpg' },
-        { id: 3, url: 'https://i.ibb.co/QvHTPfCx/1755385460671.jpg' },
-        { id: 4, url: 'https://i.ibb.co/R4950Nvw/1755385460644.jpg' },
-        { id: 5, url: 'https://i.ibb.co/KjbKpnHg/1755385460618.jpg' },
-        { id: 6, url: 'https://i.ibb.co/sJ6rFm02/1755385460598.jpg' },
-        { id: 7, url: 'https://i.ibb.co/C563y0FN/1755385460569.jpg' },
-        { id: 8, url: 'https://i.ibb.co/vx83QSYq/1755385460544.jpg' },
-        { id: 9, url: 'https://i.ibb.co/LDwKr6Yh/1755385460515.jpg' },
-        { id: 10, url: 'https://i.ibb.co/Pvj0fxFz/1755385460489.jpg' },
-        { id: 11, url: 'https://i.ibb.co/rGBX2FWt/1755385460463.jpg' },
-        { id: 12, url: 'https://i.ibb.co/KpXd07pm/1755385460411.jpg' },
-        { id: 13, url: 'https://i.ibb.co/rf5zJH64/1755385460377.jpg' },
-        { id: 14, url: 'https://i.ibb.co/d4XG6cQv/1755385460348.jpg' },
-        { id: 15, url: 'https://i.ibb.co/jP4hqLZ8/1755385460311.jpg' },
-        { id: 16, url: 'https://i.ibb.co/nNdgfQzM/1755385460276.jpg' },
-        { id: 17, url: 'https://i.ibb.co/JRJyGz4K/1755385460246.jpg' },
-        { id: 18, url: 'https://i.ibb.co/VY0KbTrP/1755385460224.jpg' },
-        { id: 19, url: 'https://i.ibb.co/KccNybcz/1755385460205.jpg' },
-        { id: 20, url: 'https://i.ibb.co/gM5wP88B/1755385460187.jpg' },
-        { id: 21, url: 'https://i.ibb.co/ns4t330R/1755385460163.jpg' },
-        { id: 22, url: 'https://i.ibb.co/C3z99tnh/1755385460141-1.jpg' }
+        { id: 1, url: 'https://i.ibb.co/20rqPm2r/1755385460802.jpg', caption: 'holder' },
+        { id: 2, url: 'https://i.ibb.co/p6QdsSqW/1755385460701.jpg', caption: 'holder' },
+        { id: 3, url: 'https://i.ibb.co/QvHTPfCx/1755385460671.jpg', caption: 'holder' },
+        { id: 4, url: 'https://i.ibb.co/R4950Nvw/1755385460644.jpg', caption: 'holder' },
+        { id: 5, url: 'https://i.ibb.co/KjbKpnHg/1755385460618.jpg', caption: 'holder' },
+        { id: 6, url: 'https://i.ibb.co/sJ6rFm02/1755385460598.jpg', caption: 'holder' },
+        { id: 7, url: 'https://i.ibb.co/C563y0FN/1755385460569.jpg', caption: 'holder' },
+        { id: 8, url: 'https://i.ibb.co/vx83QSYq/1755385460544.jpg', caption: 'holder' },
+        { id: 9, url: 'https://i.ibb.co/LDwKr6Yh/1755385460515.jpg', caption: 'holder' },
+        { id: 10, url: 'https://i.ibb.co/Pvj0fxFz/1755385460489.jpg', caption: 'holder' },
+        { id: 11, url: 'https://i.ibb.co/rGBX2FWt/1755385460463.jpg', caption: 'holder' },
+        { id: 12, url: 'https://i.ibb.co/KpXd07pm/1755385460411.jpg', caption: 'holder' },
+        { id: 13, url: 'https://i.ibb.co/rf5zJH64/1755385460377.jpg', caption: 'holder' },
+        { id: 14, url: 'https://i.ibb.co/d4XG6cQv/1755385460348.jpg', caption: 'holder' },
+        { id: 15, url: 'https://i.ibb.co/jP4hqLZ8/1755385460311.jpg', caption: 'holder' },
+        { id: 16, url: 'https://i.ibb.co/nNdgfQzM/1755385460276.jpg', caption: 'holder' },
+        { id: 17, url: 'https://i.ibb.co/JRJyGz4K/1755385460246.jpg', caption: 'holder' },
+        { id: 18, url: 'https://i.ibb.co/VY0KbTrP/1755385460224.jpg', caption: 'holder' },
+        { id: 19, url: 'https://i.ibb.co/KccNybcz/1755385460205.jpg', caption: 'holder' },
+        { id: 20, url: 'https://i.ibb.co/gM5wP88B/1755385460187.jpg', caption: 'holder' },
+        { id: 21, url: 'https://i.ibb.co/ns4t330R/1755385460163.jpg', caption: 'holder' },
+        { id: 22, url: 'https://i.ibb.co/C3z99tnh/1755385460141-1.jpg', caption: 'holder' }
       ];
 
       const filteredPhotos = photos.filter((photo) =>
-        'holder'.toLowerCase().includes(searchTerm.toLowerCase())
+        photo.caption.toLowerCase().includes(searchTerm.toLowerCase())
       );
 
       useEffect(() => {
@@ -592,10 +592,11 @@
                   >
                     <img
                       src={photo.url}
-                      alt="holder"
+                      alt={photo.caption}
                       className="h-32 sm:h-40 md:h-48 rounded-lg aspect-square object-cover shadow-md"
                       loading="lazy"
                     />
+                    <p className="text-center text-gray-700 font-medium text-base sm:text-lg mt-2">{photo.caption}</p>
                   </div>
                 ))
               )}
